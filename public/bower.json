@@ -1,0 +1,18 @@
+{
+  "name": "one-day-to-live",
+  "version": "0.0.0",
+  "authors": [
+    "Benoit deKajoo <dekajoo@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.22"
+  }
+}
