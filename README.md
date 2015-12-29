@@ -10,5 +10,5 @@
 
 ## Setup project
 * In `/` Type `npm install`
-* In `public/` type `bower install`
+* In `public/` type `bower install` (You will need bower installed `npm install -g bower`)
 * In `/` run the server with `node game.js`
