@@ -7,18 +7,16 @@ import {TileType} from "./src/Map"
 
 export class Game {
     constructor() {
+        var debug = false;
         var socket: SocketIOClient.Socket;
+        var player;
+        var remotePlayers: Player[];
+        var map: Map;
 
         GameContext.init();
 
-        var player, remotePlayers = [];
-        var map;
-
         var BasicGame: any = function (game) { };
-
-        BasicGame.Boot = function (game) {
-            // nothing here
-        };
+        BasicGame.Boot = function(game) { };
 
         BasicGame.Boot.prototype =
         {
@@ -30,9 +28,12 @@ export class Game {
                 // init map
                 map = new Map();
 
+                //init remotePlayers
+                remotePlayers = [];
+
                 // init player
                 player = GameContext.instance.add.isoSprite(2 * 32, 2 * 32, 48, 'fairy_anim', 0, Map.isoGroup);
-                player.anchor.set(0.5);
+                player.anchor.set(0.5, 0.5);
                 player.gridPosition = new Phaser.Point(2, 2);
                 player.isMoving = false;
                 player.scale.set(0.5);
@@ -49,6 +50,12 @@ export class Game {
                     Phaser.Keyboard.DOWN,
                     Phaser.Keyboard.SPACEBAR
                 ]);
+
+                // press space to enter debugmode
+                var space = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+                space.onDown.add(function() {
+                    debug = !debug;
+                }, this);
 
                 // socket.io
                 socket = io('http://' + window.location.hostname + ':8000');
@@ -71,7 +78,6 @@ export class Game {
             update: function () {
                 map.update();
 
-
                 // keyboard actions
                 if (this.cursors.up.isDown) {
                     movePlayer(0, -1);
@@ -86,10 +92,12 @@ export class Game {
                 updateRemotePlayers();
             },
             render: function() {
-//                Map.isoGroup.forEach(function (tile) {
-//                    GameContext.instance.debug.body(tile, 'rgba(189, 221, 235, 0.6)', false);
-//                }, this);
-                GameContext.instance.debug.text(!!GameContext.instance.time.fps ? "" + GameContext.instance.time.fps : '--', 2, 14, "#a7aebe");
+                if (debug) {
+                    Map.isoGroup.forEach(function(tile) {
+                        GameContext.instance.debug.body(tile, 'rgba(189, 221, 235, 0.6)', false);
+                    }, this);
+                    GameContext.instance.debug.text(!!GameContext.instance.time.fps ? "" + GameContext.instance.time.fps : '--', 2, 14, "#a7aebe");
+                }
             }
         };
 
@@ -100,14 +108,7 @@ export class Game {
 
             var destPoint = new Phaser.Point(player.gridPosition.x + x, player.gridPosition.y + y);
 
-            // collision handling
-            var destTile = map.getPlateau(destPoint.x, destPoint.y);
-            if (destTile == TileType.Water || destTile == TileType.Bush1 || destTile == TileType.Bush2
-                || destTile == TileType.Mushroom || destTile == TileType.Wall || destTile == TileType.Window) {
-                return;
-            }
-
-            if (destPoint.x < 1 || destPoint.x > 11 || destPoint.y < 1 || destPoint.y > 11)
+            if (!map.isCaseAccessible(destPoint.x, destPoint.y))
                 return;
 
             if (isTileOccupied(destPoint.x, destPoint.y))
@@ -195,13 +196,13 @@ export class Game {
         }
 
         // UTILS: Find player by ID
-        function playerById(id) {
+        function playerById(id): Player {
             for (var i = 0; i < remotePlayers.length; i++) {
                 if (remotePlayers[i].id == id)
                     return remotePlayers[i];
             };
 
-            return false;
+            return null;
         };
 
     }

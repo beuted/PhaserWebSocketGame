@@ -25,9 +25,11 @@ export class Map {
     private static tileSize = 32;
 
     private plateau: number[];
+    private plateauXSize: number;
+    private plateauYSize: number;
+    private plateauTiles: any[]; //Phaser.Plugin.Isometric.IsoSprite[];
     private tileArray: string[];
     private water: Phaser.Plugin.Isometric.IsoSprite[];
-
 
     constructor() {
         // init plateau
@@ -40,13 +42,20 @@ export class Map {
             0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
-            11, 11, 12, 11, 3, 3, 11, 12, 11, 11, 11,
-            3, 7, 3, 3, 3, 3, 3, 3, 7, 3, 3,
-            7, 1, 7, 7, 3, 3, 7, 7, 1, 1, 7
+            11, 11, 12, 11, 3, 3, 11, 12, 11, 0, 11,
+            3, 7, 3, 3, 3, 3, 3, 3, 7, 0, 3,
+            7, 1, 7, 7, 3, 3, 7, 7, 1, 1, 7,
+            1, 1, 1, 7, 3, 7, 1, 1, 1, 1, 1,
+            1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1,
+            11, 11, 12, 11, 12, 11, 11, 12, 11, 11, 11,
         ];
 
-        //init water;
+        this.plateauXSize = 11;
+        this.plateauYSize = 14;
+
+        //init water & plateauTiles
         this.water = [];
+        this.plateauTiles = [];
 
         // init tileArray
         this.tileArray = [];
@@ -74,7 +83,22 @@ export class Map {
     }
 
     public getPlateau(x: number, y: number) {
-        return this.plateau[(x - 1) + (y - 1) * 11];
+        return this.plateau[(x - 1) + (y - 1) * this.plateauXSize];
+    }
+
+    public isCaseAccessible(x: number, y: number) {
+        // collision handling
+        var destTile = this.getPlateau(x, y);
+        if (destTile == TileType.Water || destTile == TileType.Bush1 || destTile == TileType.Bush2
+            || destTile == TileType.Mushroom || destTile == TileType.Wall || destTile == TileType.Window) {
+            return false;
+        }
+
+        // don't go out of the map
+        if (x < 1 || x > this.plateauXSize || y < 1 || y > this.plateauYSize)
+            return false;
+
+        return true;
     }
 
     public update() {
@@ -84,25 +108,35 @@ export class Map {
             w.alpha = Phaser.Math.clamp(1 + (w.isoZ * 0.1), 0.2, 1);
         });
 
+        // tile selection animation
+        // > Update the cursor position. (TODO: this shouldn't be done in Map)
+        var cursorPos: Phaser.Plugin.Isometric.Point3 = GameContext.instance.iso.unproject(GameContext.instance.input.activePointer.position);
+
+        this.plateauTiles.forEach(function(tile) { //Note: those "1.5" are fucking mysterious to me :/
+            var inBounds = tile.isoBounds.containsXY(cursorPos.x + Map.tileSize * 1.5, cursorPos.y + Map.tileSize * 1.5);
+            // If it does, do a little animation and tint change.
+            if (inBounds) {
+                tile.tint = 0x86bfda;
+            } else if (!inBounds) {
+                tile.tint = 0xffffff;
+            }
+        }, this);
+
         // topological sort for the isometric tiles
         GameContext.instance.iso.topologicalSort(Map.isoGroup);
     }
 
     private initPlateau() {
         var i = 0, tile;
-        for (var y = Map.tileSize; y <= GameContext.instance.physics.isoArcade.bounds.frontY - Map.tileSize; y += Map.tileSize) {
-            for (var x = Map.tileSize; x <= GameContext.instance.physics.isoArcade.bounds.frontX - Map.tileSize; x += Map.tileSize) {
+        for (var y = 1; y <= this.plateauYSize; y++) {
+            for (var x = 1; x <= this.plateauXSize; x++) {
                 // this bit would've been so much cleaner if I'd ordered the tileArray better, but I can't be bothered fixing it :P
-                tile = GameContext.instance.add.isoSprite(x, y, 0, 'tileset', this.tileArray[this.plateau[i]], Map.isoGroup);
+                tile = GameContext.instance.add.isoSprite(x * Map.tileSize, y * Map.tileSize, 0, 'tileset', this.tileArray[this.plateau[i]], Map.isoGroup);
                 tile.anchor.set(0.5, 1);
                 tile.smoothed = true;
                 tile.body.moves = false;
-                if (this.plateau[i] === 4) {
-                    tile.isoZ += 6;
-                }
-                //if (this.plateau[i] <= 10 && (this.plateau[i] < 5 || this.plateau[i] > 6)) {
-                    //tile.scale.x = game.rnd.pick([-1, 1]);
-                //}
+
+                this.plateauTiles.push(tile);
                 if (this.plateau[i] === 0) {
                     this.water.push(tile);
                 }

@@ -11,7 +11,7 @@ export class GameContext {
     static preload() {
         GameContext.instance.time.advancedTiming = true;
         GameContext.instance.debug.renderShadow = false;
-        GameContext.instance.stage.disableVisibilityChange = true;
+        GameContext.instance.stage.disableVisibilityChange = true; // Don't stop the game when running in background
 
         GameContext.preloadAssets();
         GameContext.preloadIsometricPlugin();
