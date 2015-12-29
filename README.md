@@ -11,6 +11,6 @@
 ## Setup project
 * In `/` Type `npm install`
 * In `public/` type `bower install` (You will need bower installed `npm install -g bower`)
-* In `/` Build the typescript of the client with `grunt:ts`
+* In `/` Build the typescript of the client with `grunt:ts` (You will need grunt installed `npm install -g grunt && npm install -g grunt-cli`)
 * In `/` run the server with `node game.js`
 * Connect to `localhost:3000` with as many browsers as you want!
