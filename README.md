@@ -5,8 +5,10 @@
 ## Technos used
 * [Phaser](http://www.phaser.io/)
 * [Phaser Isometric Plugin](http://www.rotates.org/phaser/iso/)
+* [Socket.io](http://socket.io/)
+* [Express](http://expressjs.com/)
 * [Typescript](http://www.typescriptlang.org/)
-* [requirejs](http://requirejs.org/)
+* [Requirejs](http://requirejs.org/)
 
 ## Setup project
 * In `/` Type `npm install`
