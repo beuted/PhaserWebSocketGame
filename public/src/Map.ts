@@ -100,9 +100,9 @@ export class Map {
                 if (this.plateau[i] === 4) {
                     tile.isoZ += 6;
                 }
-                if (this.plateau[i] <= 10 && (this.plateau[i] < 5 || this.plateau[i] > 6)) {
+                //if (this.plateau[i] <= 10 && (this.plateau[i] < 5 || this.plateau[i] > 6)) {
                     //tile.scale.x = game.rnd.pick([-1, 1]);
-                }
+                //}
                 if (this.plateau[i] === 0) {
                     this.water.push(tile);
                 }

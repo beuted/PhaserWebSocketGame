@@ -5,12 +5,9 @@ import {GameContext} from "./src/GameContext";
 import {Map} from "./src/Map";
 import {TileType} from "./src/Map"
 
-// Hack for the ts compilator to ba able to access the io object
-declare var io: any;
-
 export class Game {
     constructor() {
-        var socket: SocketIO.Socket;
+        var socket: SocketIOClient.Socket;
 
         GameContext.init();
 
@@ -34,11 +31,13 @@ export class Game {
                 map = new Map();
 
                 // init player
-                player = GameContext.instance.add.isoSprite(2 * 32, 2 * 32, 40, 'player', 0, Map.isoGroup);
-                player.tint = 0xff00ff;
+                player = GameContext.instance.add.isoSprite(2 * 32, 2 * 32, 48, 'fairy_anim', 0, Map.isoGroup);
                 player.anchor.set(0.5);
                 player.gridPosition = new Phaser.Point(2, 2);
                 player.isMoving = false;
+                player.scale.set(0.5);
+                player.smoothed = false;
+                player.animations.add('fly').play(10, true);
 
 
                 // Set up our controls.
@@ -52,7 +51,7 @@ export class Game {
                 ]);
 
                 // socket.io
-                socket = io("http://localhost:8000");
+                socket = io('http://' + window.location.hostname + ':8000');
 
                 // Socket connection successful
                 socket.on("connect", onSocketConnected);
@@ -72,6 +71,7 @@ export class Game {
             update: function () {
                 map.update();
 
+
                 // keyboard actions
                 if (this.cursors.up.isDown) {
                     movePlayer(0, -1);
@@ -86,9 +86,9 @@ export class Game {
                 updateRemotePlayers();
             },
             render: function() {
-        /*        GameContext.isoGroup.forEach(function (tile) {
-                    game.debug.body(tile, 'rgba(189, 221, 235, 0.6)', false);
-                });*/
+//                Map.isoGroup.forEach(function (tile) {
+//                    GameContext.instance.debug.body(tile, 'rgba(189, 221, 235, 0.6)', false);
+//                }, this);
                 GameContext.instance.debug.text(!!GameContext.instance.time.fps ? "" + GameContext.instance.time.fps : '--', 2, 14, "#a7aebe");
             }
         };
@@ -189,7 +189,7 @@ export class Game {
         };
 
         function updateRemotePlayers() {
-            remotePlayers.forEach(function (p) {
+            remotePlayers.forEach(function (p: Player) {
                 p.update();
             });
         }

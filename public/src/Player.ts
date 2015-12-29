@@ -11,9 +11,17 @@ export class Player {
 
     constructor(startX: number, startY: number, id: string) {
         // setting up the sprite
-        this.sprite = GameContext.instance.add.isoSprite(startX * 32, startY * 32, 40, 'player', 0, Map.isoGroup);
-        this.sprite.tint = 0x00ffff;
+        //this.sprite = GameContext.instance.add.isoSprite(startX * 32, startY * 32, 48, 'cube', 0, Map.isoGroup); // old cube sprite
+
+        this.sprite = GameContext.instance.add.isoSprite(2 * 32, 2 * 32, 48, 'fairy_anim', 0, Map.isoGroup);
+        this.sprite.alpha = 0.7;
         this.sprite.anchor.set(0.5);
+        this.sprite.gridPosition = new Phaser.Point(2, 2);
+        this.sprite.isMoving = false;
+        this.sprite.scale.set(0.5);
+        this.sprite.smoothed = false;
+        this.sprite.animations.add('fly2').play(10, true);
+
 
         // setting up custom parameters
         this.gridPosition = new Phaser.Point(startX, startY);
