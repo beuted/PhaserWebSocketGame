@@ -42,7 +42,7 @@ export class Game {
 
         //TODO: this should be in a class handling current player actions
         function movePlayer(point: Phaser.Point) {
-            if (!point || GameContext.player.movesToPerform.length || GameContext.remotePlayersManager.arePresentAt(point.x, point.y) || !GameContext.map.isCaseAccessible(point.x, point.y))
+            if (!point || GameContext.player.movesToPerform.length || GameContext.remotePlayersManager.arePresentAt(point) || !GameContext.map.isCaseAccessible(point))
                 return;
 
             GameContext.socketManager.requestPlayerMove(point);

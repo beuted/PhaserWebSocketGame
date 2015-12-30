@@ -73,38 +73,40 @@ export class Map {
         this.initPlateau();
     }
 
-    public getPlateau(x: number, y: number): number {
-        var line = this.plateau.tiles[y];
-        if (line === undefined || line[x] === undefined) {
-            console.log("[WARNING: Map>getPlateau] Tried to access (" + x + ", " + y + ") but it is undefined");
+    public get plateauSize() { return new Phaser.Point(this.plateau.sizeX, this.plateau.sizeY) }
+
+    public getPlateau(point: Phaser.Point): number {
+        var line = this.plateau.tiles[point.y];
+        if (line === undefined || line[point.x] === undefined) {
+            console.log("[WARNING: Map>getPlateau] Tried to access (" + point.x + ", " + point.y + ") but it is undefined");
             return 0;
         }
-        return line[x];
+        return line[point.x];
     }
 
-    public isCaseAccessible(x: number, y: number) {
+    public isCaseAccessible(point: Phaser.Point) {
         // collision handling
-        var destTile: TileType = this.getPlateau(x, y);
+        var destTile: TileType = this.getPlateau(point);
         if (_.includes(this.plateau.blocking, destTile)) {
             return false;
         }
 
-        // don't go out of the map
-        if (x < 0 || x > this.plateau.sizeX - 1 || y < 0 || y > this.plateau.sizeY - 1)
+        // don't go out of the map TODO REFACTO
+        if (point.x < 0 || point.x > this.plateau.sizeX - 1 || point.y < 0 || point.y > this.plateau.sizeY - 1)
             return false;
 
         return true;
     }
 
-    public isCaseOpaque(x: number, y: number) {
+    public isCaseOpaque(point: Phaser.Point) {
         // collision handling
-        var destTile: TileType = this.getPlateau(x, y);
+        var destTile: TileType = this.getPlateau(point);
         if (_.includes(this.plateau.opaque, destTile)) {
             return true;
         }
 
-        // don't go out of the map
-        if (x < 0 || x > this.plateau.sizeX - 1 || y < 0 || y > this.plateau.sizeY - 1)
+        // don't go out of the map TODO REFACTO
+        if (point.x < 0 || point.x > this.plateau.sizeX - 1 || point.y < 0 || point.y > this.plateau.sizeY - 1)
             return true;
 
         return false;
@@ -153,23 +155,24 @@ export class Map {
 
     private initPlateau() {
         var tile;
-        for (var y = 0; y < this.plateau.sizeY; y++) {
-            for (var x = 0; x < this.plateau.sizeX; x++) {
+        var point: Phaser.Point = new Phaser.Point(0, 0);
+        for (point.y = 0; point.y < this.plateau.sizeY; point.y++) {
+            for (point.x = 0; point.x < this.plateau.sizeX; point.x++) {
                 // this bit would've been so much cleaner if I'd ordered the tileArray better, but I can't be bothered fixing it :P
-                tile = GameContext.instance.add.isoSprite(x * Map.tileSize, y * Map.tileSize, 0, 'tileset', this.tileArray[this.getPlateau(x, y)], Map.isoGroup);
+                tile = GameContext.instance.add.isoSprite(point.x * Map.tileSize, point.y * Map.tileSize, 0, 'tileset', this.tileArray[this.getPlateau(point)], Map.isoGroup);
                 tile.anchor.set(0.5, 1);
                 tile.smoothed = true;
                 tile.body.moves = false;
 
                 this.plateauTiles.push(tile);
-                if (this.getPlateau(x, y) === 0) {
+                if (this.getPlateau(point) === 0) {
                     this.water.push(tile);
                 }
             }
         }
     }
 
-    private getPlateauTile(x: number, y: number) {
-        return this.plateauTiles[x + y * this.plateau.sizeX];
+    public getPlateauTile(point: Phaser.Point) {
+        return this.plateauTiles[point.x + point.y * this.plateau.sizeX];
     }
 }

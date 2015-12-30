@@ -46,9 +46,9 @@ export class RemotePlayersManager {
         playerToMove.move(path)
     }
 
-    public arePresentAt(x, y) {
+    public arePresentAt(point: Phaser.Point) {
         for (var i = 0; i < this.remotePlayers.length; i++) {
-            if (this.remotePlayers[i].gridPosition.x == x && this.remotePlayers[i].gridPosition.y == y) {
+            if (Phaser.Point.equals(this.remotePlayers[i].gridPosition, point)) {
                 return true;
             }
         }
