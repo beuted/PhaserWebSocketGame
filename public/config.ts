@@ -5,18 +5,19 @@ import {Game} from "./Game";
 requirejs.config({
     paths: {
         "phaser": "vendors/phaser/phaser.min",
-        "phaserPluginIsometric": "vendors/phaser/phaser-plugin-isometric.min"
+        "phaserPluginIsometric": "vendors/phaser/phaser-plugin-isometric.min",
+        "_": "bower_components/lodash/lodash"
     },
     shim: {
-        'phaser': {
-            exports: 'Phaser'
+        "phaser": {
+            exports: "Phaser"
         },
-        'phaserPluginIsometric': {
-            deps: ['phaser']
+        "phaserPluginIsometric": {
+            deps: ["phaser"]
         }
     }
 });
 
-require(["phaser", "phaserPluginIsometric", "Game"], function(Phaser) {
+require(['_', 'phaser', 'phaserPluginIsometric', 'Game'], function(_, Phaser) {
     var game = new Game();
 });

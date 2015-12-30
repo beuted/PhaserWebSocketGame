@@ -23,6 +23,7 @@ export class GameContext {
     }
 
     private static preloadAssets() {
+        GameContext.instance.load.json('map', 'maps/map.json');
         GameContext.instance.load.atlasJSONHash('tileset', 'assets/tileset.png', 'assets/tileset.json');
         GameContext.instance.load.image('cube', 'assets/cube.png');
         GameContext.instance.load.spritesheet('fairy_anim', 'assets/fairy.png', 96, 96, 16);

@@ -18,44 +18,33 @@ export enum TileType {
     Window,
 }
 
+interface Plateau {
+    tiles: number[][];
+    sizeX: number;
+    sizeY: number;
+    blocking: number[];
+}
+
 export class Map {
     // TODO: should be private once character will be handle by the Map
     public static isoGroup: Phaser.Group;
+    public selectedTileGridCoord: Phaser.Point;
 
     private static tileSize = 32;
 
-    private plateau: number[];
-    private plateauXSize: number;
-    private plateauYSize: number;
+    private plateau: Plateau;
     private plateauTiles: any[]; //Phaser.Plugin.Isometric.IsoSprite[];
     private tileArray: string[];
     private water: Phaser.Plugin.Isometric.IsoSprite[];
 
     constructor() {
         // init plateau
-        this.plateau = [
-            9, 2, 1, 1, 4, 4, 1, 6, 2, 10, 2,
-            2, 6, 1, 0, 4, 4, 0, 0, 2, 2, 2,
-            6, 1, 0, 0, 4, 4, 0, 0, 8, 8, 2,
-            0, 0, 0, 0, 4, 4, 0, 0, 0, 9, 2,
-            0, 0, 0, 0, 4, 4, 4, 4, 4, 4, 0,
-            0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0,
-            11, 11, 12, 11, 3, 3, 11, 12, 11, 0, 11,
-            3, 7, 3, 3, 3, 3, 3, 3, 7, 0, 3,
-            7, 1, 7, 7, 3, 3, 7, 7, 1, 1, 7,
-            1, 1, 1, 7, 3, 7, 1, 1, 1, 1, 1,
-            1, 1, 1, 1, 7, 1, 1, 1, 1, 1, 1,
-            11, 11, 12, 11, 12, 11, 11, 12, 11, 11, 11,
-        ];
-
-        this.plateauXSize = 11;
-        this.plateauYSize = 14;
+        this.plateau = GameContext.instance.cache.getJSON('map');
 
         //init water & plateauTiles
         this.water = [];
         this.plateauTiles = [];
+        this.selectedTileGridCoord = null;
 
         // init tileArray
         this.tileArray = [];
@@ -82,20 +71,24 @@ export class Map {
         this.initPlateau();
     }
 
-    public getPlateau(x: number, y: number) {
-        return this.plateau[(x - 1) + (y - 1) * this.plateauXSize];
+    public getPlateau(x: number, y: number): number {
+        var line = this.plateau.tiles[y];
+        if (line === undefined || line[x] === undefined) {
+            console.log("[WARNING: Map>getPlateau] Tried to access (" + x + ", " + y + ") but it is undefined");
+            return 0;
+        }
+        return line[x];
     }
 
     public isCaseAccessible(x: number, y: number) {
         // collision handling
-        var destTile = this.getPlateau(x, y);
-        if (destTile == TileType.Water || destTile == TileType.Bush1 || destTile == TileType.Bush2
-            || destTile == TileType.Mushroom || destTile == TileType.Wall || destTile == TileType.Window) {
+        var destTile: TileType = this.getPlateau(x, y);
+        if (_.includes(this.plateau.blocking, destTile)) {
             return false;
         }
 
         // don't go out of the map
-        if (x < 1 || x > this.plateauXSize || y < 1 || y > this.plateauYSize)
+        if (x < 0 || x > this.plateau.sizeX - 1 || y < 0 || y > this.plateau.sizeY - 1)
             return false;
 
         return true;
@@ -111,36 +104,45 @@ export class Map {
         // tile selection animation
         // > Update the cursor position. (TODO: this shouldn't be done in Map)
         var cursorPos: Phaser.Plugin.Isometric.Point3 = GameContext.instance.iso.unproject(GameContext.instance.input.activePointer.position);
+        var selectedTile: any;
 
-        this.plateauTiles.forEach(function(tile) { //Note: those "1.5" are fucking mysterious to me :/
+        this.plateauTiles.forEach(function(tile, i) {
+            //Note: those "1.5" are fucking mysterious to me :/
             var inBounds = tile.isoBounds.containsXY(cursorPos.x + Map.tileSize * 1.5, cursorPos.y + Map.tileSize * 1.5);
-            // If it does, do a little animation and tint change.
             if (inBounds) {
-                tile.tint = 0x86bfda;
+                selectedTile = tile;
+                selectedTile.tint = 0x86bfda;
+
+                this.selectedTileGridCoord = new Phaser.Point(i % this.plateau.sizeX, Math.floor(i / this.plateau.sizeX));
             } else if (!inBounds) {
                 tile.tint = 0xffffff;
             }
         }, this);
+
+        if (!selectedTile) {
+            this.selectedTileGridCoord = null;
+        } else if (GameContext.instance.input.activePointer.isDown) {
+            selectedTile.tint = 0xff00ff;
+        }
 
         // topological sort for the isometric tiles
         GameContext.instance.iso.topologicalSort(Map.isoGroup);
     }
 
     private initPlateau() {
-        var i = 0, tile;
-        for (var y = 1; y <= this.plateauYSize; y++) {
-            for (var x = 1; x <= this.plateauXSize; x++) {
+        var tile;
+        for (var y = 0; y < this.plateau.sizeY; y++) {
+            for (var x = 0; x < this.plateau.sizeX; x++) {
                 // this bit would've been so much cleaner if I'd ordered the tileArray better, but I can't be bothered fixing it :P
-                tile = GameContext.instance.add.isoSprite(x * Map.tileSize, y * Map.tileSize, 0, 'tileset', this.tileArray[this.plateau[i]], Map.isoGroup);
+                tile = GameContext.instance.add.isoSprite(x * Map.tileSize, y * Map.tileSize, 0, 'tileset', this.tileArray[this.getPlateau(x, y)], Map.isoGroup);
                 tile.anchor.set(0.5, 1);
                 tile.smoothed = true;
                 tile.body.moves = false;
 
                 this.plateauTiles.push(tile);
-                if (this.plateau[i] === 0) {
+                if (this.getPlateau(x, y) === 0) {
                     this.water.push(tile);
                 }
-                i++;
             }
         }
     }

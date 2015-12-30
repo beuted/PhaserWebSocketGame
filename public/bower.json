@@ -13,6 +13,7 @@
     "tests"
   ],
   "dependencies": {
-    "requirejs": "~2.1.22"
+    "requirejs": "~2.1.22",
+    "lodash": "~3.10.1"
   }
 }

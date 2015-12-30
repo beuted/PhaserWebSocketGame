@@ -2,6 +2,8 @@
 ** NODE.JS REQUIREMENTS
 **************************************************/
 var util = require('util'),                 // Utility resources (logging, object inspection, etc)
+    _ = require('lodash'),
+    PF = require('pathfinding'),
     express = require('express')
     app = express(),                      // Express
     server = require('http').createServer(app),
@@ -15,16 +17,35 @@ app.listen(3000);
 /**************************************************
 ** GAME VARIABLES
 **************************************************/
-var socket,     // Socket controller
-    players;    // Array of connected players
-
+var socket,         // Socket controller
+    players,        // Array of connected players
+    map,            // Map
+    finder;         // PathFinder
 
 /**************************************************
 ** GAME INITIALISATION
 **************************************************/
 function init() {
+    // init pathfind
+    finder = new PF.AStarFinder();
+
     // Create an empty array to store players
     players = [];
+
+    // Load the map
+    map = require('./public/maps/map');
+
+    // init walkable Map
+    var walkableMatrix = [];
+    for (var y = 0; y < map.sizeY; y++) {
+        walkableMatrix.push([]);
+        for (var x = 0; x < map.sizeX; x++) {
+            walkableMatrix[y].push(_.includes(map.blocking, map.tiles[y][x]) ? 1 : 0);
+        }
+    }
+
+    map.walkableGrid = new PF.Grid(walkableMatrix);
+    console.log(JSON.stringify(map.walkableGrid));
 
     // Set up Socket.IO to listen on port 8000
     io.listen(8000);
@@ -64,7 +85,7 @@ function onClientDisconnect() {
 
     // Player not found
     if (!removePlayer) {
-        util.log('Player not found: ' + this.id);
+        util.log('[Error: "remove player"] Player not found: ' + this.id);
         return;
     };
 
@@ -102,9 +123,22 @@ function onMovePlayer(data) {
 
     // Player not found
     if (!movePlayer) {
-        util.log('Player not found: ' + this.id);
+        util.log('[Error: "move player"] Player not found: ' + this.id);
         return;
-    };
+    }
+
+    if (movePlayer.getX() == data.x && movePlayer.getY() == data.y) {
+        return;
+    }
+
+    //var destTile = map.tiles[data.y][data.x];
+    var path = finder.findPath(movePlayer.getX(), movePlayer.getY(), data.x, data.y, map.walkableGrid.clone());
+    if (!path.length) {
+        util.log('[Debug: "move player"] Player '+ this.id + ' can\'t moved : (' + movePlayer.getX() + ', ' + movePlayer.getY() + ')=>(' + data.x + ', ' + data.y + ')');
+        return;
+    }
+
+    util.log('[Debug: "move player"] Player ' + this.id + ' moved : (' + movePlayer.getX() + ', ' + movePlayer.getY() + ')=>(' + data.x + ', ' + data.y + ')');
 
     // Update player position
     movePlayer.setX(data.x);
@@ -112,6 +146,7 @@ function onMovePlayer(data) {
 
     // Broadcast updated position to connected socket clients
     this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+    this.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
 };
 
 

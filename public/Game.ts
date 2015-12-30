@@ -9,7 +9,7 @@ export class Game {
     constructor() {
         var debug = false;
         var socket: SocketIOClient.Socket;
-        var player;
+        var player: Player;
         var remotePlayers: Player[];
         var map: Map;
 
@@ -25,6 +25,14 @@ export class Game {
             },
             create: function() {
 
+                // socket.io
+                socket = io('http://' + window.location.hostname + ':8000');
+                socket.on("connect", onSocketConnected);       // Socket connection successful
+                socket.on("disconnect", onSocketDisconnect);   // Socket disconnection
+                socket.on("new player", onNewPlayer);          // New player message received
+                socket.on("move player", onMovePlayer);        // Player move message received
+                socket.on("remove player", onRemovePlayer);    // Player removed message received
+
                 // init map
                 map = new Map();
 
@@ -32,13 +40,7 @@ export class Game {
                 remotePlayers = [];
 
                 // init player
-                player = GameContext.instance.add.isoSprite(2 * 32, 2 * 32, 48, 'fairy_anim', 0, Map.isoGroup);
-                player.anchor.set(0.5, 0.5);
-                player.gridPosition = new Phaser.Point(2, 2);
-                player.isMoving = false;
-                player.scale.set(0.5);
-                player.smoothed = false;
-                player.animations.add('fly').play(10, true);
+
 
 
                 // Set up our controls.
@@ -57,39 +59,16 @@ export class Game {
                     debug = !debug;
                 }, this);
 
-                // socket.io
-                socket = io('http://' + window.location.hostname + ':8000');
-
-                // Socket connection successful
-                socket.on("connect", onSocketConnected);
-
-                // Socket disconnection
-                socket.on("disconnect", onSocketDisconnect);
-
-                // New player message received
-                socket.on("new player", onNewPlayer);
-
-                // Player move message received
-                socket.on("move player", onMovePlayer);
-
-                // Player removed message received
-                socket.on("remove player", onRemovePlayer);
+                // Capture click
+                GameContext.instance.input.onUp.add(() => movePlayer(map.selectedTileGridCoord), this);
             },
             update: function () {
                 map.update();
 
-                // keyboard actions
-                if (this.cursors.up.isDown) {
-                    movePlayer(0, -1);
-                } else if (this.cursors.down.isDown) {
-                    movePlayer(0, 1);
-                } else if (this.cursors.left.isDown) {
-                    movePlayer(-1, 0);
-                } else if (this.cursors.right.isDown) {
-                    movePlayer(1, 0);
-                }
+                if (player) { player.update(); }
 
                 updateRemotePlayers();
+
             },
             render: function() {
                 if (debug) {
@@ -103,25 +82,12 @@ export class Game {
 
         GameContext.boot(BasicGame.Boot);
 
-        function movePlayer(x, y) {
-            if (player.isMoving) { return; }
-
-            var destPoint = new Phaser.Point(player.gridPosition.x + x, player.gridPosition.y + y);
-
-            if (!map.isCaseAccessible(destPoint.x, destPoint.y))
+        function movePlayer(point: Phaser.Point) {
+            if (!point || isTileOccupied(point.x, point.y) || !map.isCaseAccessible(point.x, point.y))
                 return;
 
-            if (isTileOccupied(destPoint.x, destPoint.y))
-                return;
-
-            player.isMoving = true;
-            player.gridPosition.x += x;
-            player.gridPosition.y += y;
-            socket.emit("move player", { x: player.gridPosition.x, y: player.gridPosition.y });
-
-            // doing it this way means the player's position will always be a multiple of 32
-            GameContext.instance.add.tween(player.body).to({x: player.gridPosition.x * 32, y: player.gridPosition.y * 32}, 250, Phaser.Easing.Linear.None, true)
-                .onComplete.add(function() { player.isMoving = false;}, this);
+            console.log("sent move request: " + point.x + ", " + point.y);
+            socket.emit("move player", { x: point.x, y: point.y });
         }
 
         function isTileOccupied(x, y) {
@@ -137,10 +103,13 @@ export class Game {
 
         // Socket connected
         function onSocketConnected() {
-            console.log("Connected to socket server");
+            console.log("Connected to socket server as " + socket.io.engine.id);
+
+            player = new Player(1, 1, socket.io.engine.id, true);
 
             // Send local player data to the game server
             socket.emit("new player", {x: player.gridPosition.x, y: player.gridPosition.y});
+
         };
 
         // Socket disconnected
@@ -149,21 +118,24 @@ export class Game {
         };
 
         // New player
-        function onNewPlayer(data) {
+        function onNewPlayer(data: any) {
             console.log("New player connected: " + data.id);
 
             // Initialise the new player
-            var newPlayer = new Player(2, 2, data.id);
+            var newPlayer = new Player(1, 1, data.id);
 
             // Add new player to the remote players array
             remotePlayers.push(newPlayer);
         };
 
         // Move player
-        function onMovePlayer(data) {
-            var playerToMove = playerById(data.id);
+        function onMovePlayer(data: any) {
+            if (player.id === data.id) {
+                player.move(data.x, data.y);
+                return;
+            }
 
-            // Player not found
+            var playerToMove = playerById(data.id);
             if (!playerToMove) {
                 console.log("Player not found: " + data.id);
                 return;
