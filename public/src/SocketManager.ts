@@ -2,11 +2,11 @@
 
 import {GameContext} from "./GameContext";
 import {Player} from "./Player";
+import {RemotePlayersManager} from "./RemotePlayersManager";
 
 export class SocketManager {
 
-    //TODO this shoudl be made private
-    public socket: SocketIOClient.Socket;
+    private socket: SocketIOClient.Socket;
 
     constructor() {
         this.socket = io('http://' + window.location.hostname + ':8000');
@@ -17,10 +17,15 @@ export class SocketManager {
         this.socket.on("remove player", this.onRemovePlayer.bind(this));    // Player removed message received
     }
 
+    public requestPlayerMove(point: Phaser.Point) {
+        console.debug("sent move request: " + point.x + ", " + point.y);
+        this.socket.emit("move player", { x: point.x, y: point.y });
+    }
+
 
     // Socket connected
     private onSocketConnected() {
-        console.log("Connected to socket server as " + this.socket.io.engine.id);
+        console.debug("Connected to socket server as " + this.socket.io.engine.id);
 
         GameContext.player = new Player(1, 1, this.socket.io.engine.id, true);
         GameContext.player = GameContext.player;
@@ -31,18 +36,18 @@ export class SocketManager {
 
     // Socket disconnected
     private onSocketDisconnect() {
-        console.log("Disconnected from socket server");
+        console.debug("Disconnected from socket server");
     };
 
     // New player
     private onNewPlayer(data: any) {
-        console.log("New player connected: " + data.id);
+        console.debug("New player connected: " + data.id);
 
         // Initialise the new player
         var newPlayer = new Player(data.x, data.y, data.id);
 
         // Add new player to the remote players array
-        GameContext.remotePlayers.push(newPlayer);
+        GameContext.remotePlayersManager.add(newPlayer);
     };
 
     // Move player
@@ -52,39 +57,12 @@ export class SocketManager {
             return;
         }
 
-        var playerToMove = this.playerById(data.id);
-        if (!playerToMove) {
-            console.log("Player not found: " + data.id);
-            return;
-        };
-
-        // Update player position
-        playerToMove.move(data.path)
+        GameContext.remotePlayersManager.moveById(data.id, data.path)
     };
 
     // Remove player
     private onRemovePlayer(data) {
-        var removePlayer = this.playerById(data.id);
-
-        // Player not found
-        if (!removePlayer) {
-            console.log("Player not found: " + data.id);
-            return;
-        };
-
-        removePlayer.destroy();
-
-        // Remove player from array
-        GameContext.remotePlayers.splice(GameContext.remotePlayers.indexOf(removePlayer), 1);
-    };
-
-    // UTILS: Find player by ID
-    private playerById(id): Player {
-        for (var i = 0; i < GameContext.remotePlayers.length; i++) {
-            if (GameContext.remotePlayers[i].id == id)
-                return GameContext.remotePlayers[i];
-        };
-
-        return null;
+        // Remove player from remotePlayers
+        GameContext.remotePlayersManager.removeById(data.id)
     };
 }

@@ -40,22 +40,12 @@ export class Game {
 
         GameContext.boot(BasicGame.Boot);
 
+        //TODO: this should be in a class handling current player actions
         function movePlayer(point: Phaser.Point) {
-            if (!point || GameContext.player.movesToPerform.length || isTileOccupied(point.x, point.y) || !GameContext.map.isCaseAccessible(point.x, point.y))
+            if (!point || GameContext.player.movesToPerform.length || GameContext.remotePlayersManager.arePresentAt(point.x, point.y) || !GameContext.map.isCaseAccessible(point.x, point.y))
                 return;
 
-            console.log("sent move request: " + point.x + ", " + point.y);
-            GameContext.socketManager.socket.emit("move player", { x: point.x, y: point.y });
-        }
-
-        function isTileOccupied(x, y) {
-            for (var i = 0; i < GameContext.remotePlayers.length; i++) {
-                if (GameContext.remotePlayers[i].gridPosition.x == x && GameContext.remotePlayers[i].gridPosition.y == y) {
-                    return true;
-                }
-            }
-
-            return false
+            GameContext.socketManager.requestPlayerMove(point);
         }
     }
 }

@@ -1,12 +1,13 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Player} from "./Player";
 import {Map} from "./Map";
+import {RemotePlayersManager} from "./RemotePlayersManager";
 import {SocketManager} from "./SocketManager";
 
 export class GameContext {
     static instance: Phaser.Plugin.Isometric.Game;
     static player: Player;
-    static remotePlayers: Player[];
+    static remotePlayersManager: RemotePlayersManager;
     static map: Map;
     static socketManager: SocketManager;
 
@@ -21,7 +22,7 @@ export class GameContext {
     static create() {
         this.socketManager = new SocketManager();
         this.map = new Map();
-        this.remotePlayers = [];
+        this.remotePlayersManager = new RemotePlayersManager();
 
         GameContext.instance.input.keyboard.addKeyCapture([
             Phaser.Keyboard.SPACEBAR
@@ -51,9 +52,7 @@ export class GameContext {
         if (this.player) { this.player.update(); }
 
         // update the remote players
-        GameContext.remotePlayers.forEach(function(p: Player) {
-            p.update();
-        });
+        this.remotePlayersManager.update();
     }
 
     static boot(boot: any) {
