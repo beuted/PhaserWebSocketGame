@@ -83,7 +83,7 @@ export class Game {
         GameContext.boot(BasicGame.Boot);
 
         function movePlayer(point: Phaser.Point) {
-            if (!point || isTileOccupied(point.x, point.y) || !map.isCaseAccessible(point.x, point.y))
+            if (!point || player.movesToPerform.length || isTileOccupied(point.x, point.y) || !map.isCaseAccessible(point.x, point.y))
                 return;
 
             console.log("sent move request: " + point.x + ", " + point.y);
@@ -131,7 +131,7 @@ export class Game {
         // Move player
         function onMovePlayer(data: any) {
             if (player.id === data.id) {
-                player.move(data.x, data.y);
+                player.move(data.path);
                 return;
             }
 
@@ -142,7 +142,7 @@ export class Game {
             };
 
             // Update player position
-            playerToMove.move(data.x, data.y)
+            playerToMove.move(data.path)
         };
 
         // Remove player

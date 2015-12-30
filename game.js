@@ -138,6 +138,9 @@ function onMovePlayer(data) {
         return;
     }
 
+    // remove the first element which is not a move
+    path.shift();
+
     util.log('[Debug: "move player"] Player ' + this.id + ' moved : (' + movePlayer.getX() + ', ' + movePlayer.getY() + ')=>(' + data.x + ', ' + data.y + ')');
 
     // Update player position
@@ -145,8 +148,8 @@ function onMovePlayer(data) {
     movePlayer.setY(data.y);
 
     // Broadcast updated position to connected socket clients
-    this.broadcast.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
-    this.emit('move player', {id: movePlayer.id, x: movePlayer.getX(), y: movePlayer.getY()});
+    this.broadcast.emit('move player', {id: movePlayer.id, path: path});
+    this.emit('move player', {id: movePlayer.id, path: path});
 };
 
 

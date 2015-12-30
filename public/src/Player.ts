@@ -4,17 +4,16 @@ import {GameContext} from "./GameContext";
 import {Map} from "./Map";
 
 export class Player {
-    sprite: any;
-    gridPosition: Phaser.Point;
-    isMoving: boolean;
-    id: string;
+    public sprite: any;
+    public gridPosition: Phaser.Point;
+    public id: string;
+    public movesToPerform: number[][];
 
-    private gridPositionHasChanged: boolean;
+    private isMoving: boolean;
 
     constructor(startX: number, startY: number, id: string, current: boolean = false) {
         // setting up the sprite
         //this.sprite = GameContext.instance.add.isoSprite(startX * 32, startY * 32, 48, 'cube', 0, Map.isoGroup); // old cube sprite
-
         this.sprite = GameContext.instance.add.isoSprite(1 * 32, 1 * 32, 48, 'fairy_anim', 0, Map.isoGroup);
         this.sprite.anchor.set(0.5, 0.5);
         this.sprite.scale.set(0.5);
@@ -29,20 +28,22 @@ export class Player {
         this.gridPosition = new Phaser.Point(startX, startY);
         this.isMoving = false;
         this.id = id;
+
+        this.movesToPerform = [];
     }
 
-    move(x: number, y: number) {
-        this.gridPosition.x = x;
-        this.gridPosition.y = y;
-        this.gridPositionHasChanged = true;
+    move(path: number[][]) {
+        this.movesToPerform = this.movesToPerform.concat(path)
     }
 
     update() {
-        if (this.gridPositionHasChanged && !this.isMoving) {
+        if (this.movesToPerform.length && !this.isMoving) {
             this.isMoving = true;
-            this.gridPositionHasChanged = false;
-            GameContext.instance.add.tween(this.sprite.body).to({ x: this.gridPosition.x * 32, y: this.gridPosition .y * 32}, 250, Phaser.Easing.Linear.None, true)
-                .onComplete.add(function() { this.isMoving = false;}, this);
+            GameContext.instance.add.tween(this.sprite.body).to({ x: this.movesToPerform[0][0] * 32, y: this.movesToPerform[0][1] * 32}, 250, Phaser.Easing.Linear.None, true)
+                .onComplete.add(function() {
+                    this.isMoving = false;
+                    this.movesToPerform.shift();
+                }, this);
         }
     }
 
