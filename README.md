@@ -4,17 +4,17 @@
 
 ## Technos used
 
-### In Client
+**In Client**
 * [Phaser](http://www.phaser.io/)
 * [Phaser Isometric Plugin](http://www.rotates.org/phaser/iso/)
 * [Typescript](http://www.typescriptlang.org/)
 * [DefinitlyTyped](http://definitelytyped.org/)
 
-### In Client + Server
+**In Client + Server**
 * [Requirejs](http://requirejs.org/)
 * [Socket.io](http://socket.io/)
 
-### In Server
+**In Server**
 * [Nodejs v4.2.2](https://nodejs.org)
 * [Express](http://expressjs.com/)
 * [PathFinding.js](https://github.com/qiao/PathFinding.js/)
