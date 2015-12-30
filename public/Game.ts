@@ -122,7 +122,7 @@ export class Game {
             console.log("New player connected: " + data.id);
 
             // Initialise the new player
-            var newPlayer = new Player(1, 1, data.id);
+            var newPlayer = new Player(data.x, data.y, data.id);
 
             // Add new player to the remote players array
             remotePlayers.push(newPlayer);
