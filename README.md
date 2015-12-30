@@ -36,6 +36,6 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 * [Nodejs v4.2.2](https://nodejs.org)
 * [Express](http://expressjs.com/)
 * [PathFinding.js](https://github.com/qiao/PathFinding.js/)
-* 
+
 ## Licence
 **MIT**
