@@ -1,13 +1,37 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Player} from "./Player";
+import {Map} from "./Map";
+import {SocketManager} from "./SocketManager";
 
 export class GameContext {
     static instance: Phaser.Plugin.Isometric.Game;
     static player: Player;
+    static remotePlayers: Player[];
+    static map: Map;
+    static socketManager: SocketManager;
+
+    static debugActivated: boolean;
 
     static init() {
         // using canvas here just because it runs faster for the body debug stuff
         GameContext.instance = <Phaser.Plugin.Isometric.Game> new Phaser.Game(800, 400, Phaser.CANVAS, 'gameCanvas', null, true, false);
+        this.debugActivated = false;
+    }
+
+    static create() {
+        this.socketManager = new SocketManager();
+        this.map = new Map();
+        this.remotePlayers = [];
+
+        GameContext.instance.input.keyboard.addKeyCapture([
+            Phaser.Keyboard.SPACEBAR
+        ]);
+
+        // press space to enter debugmode
+        var space = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        space.onDown.add(function() {
+            this.debugActivated = !this.debugActivated;
+        }, this);
     }
 
     static preload() {
@@ -17,6 +41,19 @@ export class GameContext {
 
         GameContext.preloadAssets();
         GameContext.preloadIsometricPlugin();
+    }
+
+    static update() {
+        // update the map
+        this.map.update();
+
+        // update the current player if available
+        if (this.player) { this.player.update(); }
+
+        // update the remote players
+        GameContext.remotePlayers.forEach(function(p: Player) {
+            p.update();
+        });
     }
 
     static boot(boot: any) {
@@ -37,5 +74,4 @@ export class GameContext {
         GameContext.instance.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
         GameContext.instance.iso.anchor.setTo(0.5, 0.1);
     }
-
 }
