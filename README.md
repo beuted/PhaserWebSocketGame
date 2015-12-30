@@ -11,6 +11,7 @@
 * [DefinitlyTyped](http://definitelytyped.org/)
 
 **In Client + Server**
+* [Lodash](https://lodash.com/)
 * [Requirejs](http://requirejs.org/)
 * [Socket.io](http://socket.io/)
 
