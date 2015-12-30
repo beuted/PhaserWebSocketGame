@@ -2,7 +2,7 @@
 
 ###*Work in progress*
 
-This Project aim to be bootstrap Phaser project for turn based isometric games where the player in moving a grid.
+This Project aim to be bootstrap Phaser project for turn based isometric games where the player in moving on a grid.
 
 ## Features
 * Grid Map saved as Json rendered with _isometric tiles_
