@@ -6,6 +6,7 @@ import {Map} from "./Map";
 export class Player {
     public sprite: any;
     public gridPosition: Phaser.Point;
+    public visionRadius: number;
     public id: string;
     public movesToPerform: number[][];
 
@@ -26,6 +27,7 @@ export class Player {
 
         // setting up custom parameters
         this.gridPosition = new Phaser.Point(startX, startY);
+        this.visionRadius = 7;
         this.isMoving = false;
         this.id = id;
 
@@ -39,6 +41,8 @@ export class Player {
     update() {
         if (this.movesToPerform.length && !this.isMoving) {
             this.isMoving = true;
+            this.gridPosition.x = this.movesToPerform[0][0];
+            this.gridPosition.y = this.movesToPerform[0][1];
             GameContext.instance.add.tween(this.sprite.body).to({ x: this.movesToPerform[0][0] * 32, y: this.movesToPerform[0][1] * 32}, 250, Phaser.Easing.Linear.None, true)
                 .onComplete.add(function() {
                     this.isMoving = false;

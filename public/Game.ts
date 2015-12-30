@@ -39,10 +39,6 @@ export class Game {
                 //init remotePlayers
                 remotePlayers = [];
 
-                // init player
-
-
-
                 // Set up our controls.
                 this.cursors = GameContext.instance.input.keyboard.createCursorKeys();
                 this.game.input.keyboard.addKeyCapture([
@@ -106,6 +102,7 @@ export class Game {
             console.log("Connected to socket server as " + socket.io.engine.id);
 
             player = new Player(1, 1, socket.io.engine.id, true);
+            GameContext.player = player;
 
             // Send local player data to the game server
             socket.emit("new player", {x: player.gridPosition.x, y: player.gridPosition.y});

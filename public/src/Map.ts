@@ -1,6 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
 
 import {GameContext} from "./GameContext";
+import {LightSource} from "./ShadowCasting";
 
 export enum TileType {
     Water = 0,
@@ -23,6 +24,7 @@ interface Plateau {
     sizeX: number;
     sizeY: number;
     blocking: number[];
+    opaque: number[];
 }
 
 export class Map {
@@ -94,6 +96,20 @@ export class Map {
         return true;
     }
 
+    public isCaseOpaque(x: number, y: number) {
+        // collision handling
+        var destTile: TileType = this.getPlateau(x, y);
+        if (_.includes(this.plateau.opaque, destTile)) {
+            return true;
+        }
+
+        // don't go out of the map
+        if (x < 0 || x > this.plateau.sizeX - 1 || y < 0 || y > this.plateau.sizeY - 1)
+            return true;
+
+        return false;
+    }
+
     public update() {
         // make the water move nicely
         this.water.forEach(function(w) {
@@ -101,21 +117,27 @@ export class Map {
             w.alpha = Phaser.Math.clamp(1 + (w.isoZ * 0.1), 0.2, 1);
         });
 
+        // set to dark every tile by default
+        this.plateauTiles.forEach(function(tile, i) {
+            tile.tint = 0x888888;
+        }, this);
+
+        if (GameContext.player) {
+            var ls = new LightSource(GameContext.player.gridPosition, GameContext.player.visionRadius, this);
+            ls.calculate();
+        }
         // tile selection animation
         // > Update the cursor position. (TODO: this shouldn't be done in Map)
         var cursorPos: Phaser.Plugin.Isometric.Point3 = GameContext.instance.iso.unproject(GameContext.instance.input.activePointer.position);
         var selectedTile: any;
-
         this.plateauTiles.forEach(function(tile, i) {
-            //Note: those "1.5" are fucking mysterious to me :/
+            // Tile selection -- Note: those "1.5" are fucking mysterious to me :/
             var inBounds = tile.isoBounds.containsXY(cursorPos.x + Map.tileSize * 1.5, cursorPos.y + Map.tileSize * 1.5);
             if (inBounds) {
                 selectedTile = tile;
-                selectedTile.tint = 0x86bfda;
+                tile.tint = 0x86bfda;
 
                 this.selectedTileGridCoord = new Phaser.Point(i % this.plateau.sizeX, Math.floor(i / this.plateau.sizeX));
-            } else if (!inBounds) {
-                tile.tint = 0xffffff;
             }
         }, this);
 
@@ -145,5 +167,9 @@ export class Map {
                 }
             }
         }
+    }
+
+    private getPlateauTile(x: number, y: number) {
+        return this.plateauTiles[x + y * this.plateau.sizeX];
     }
 }

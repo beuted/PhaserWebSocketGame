@@ -1,7 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
+import {Player} from "./Player";
 
 export class GameContext {
     static instance: Phaser.Plugin.Isometric.Game;
+    static player: Player;
 
     static init() {
         // using canvas here just because it runs faster for the body debug stuff
