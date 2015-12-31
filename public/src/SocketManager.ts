@@ -61,7 +61,7 @@ export class SocketManager {
     };
 
     // Remove player
-    private onRemovePlayer(data) {
+    private onRemovePlayer(data: any) {
         // Remove player from remotePlayers
         GameContext.remotePlayersManager.removeById(data.id)
     };

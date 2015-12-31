@@ -1,12 +1,19 @@
 node_modules
 .tscache
 old
+
 public/bower_components
 public/src/**/*.js.map
 public/src/**/*.js
 
 public/config.js.map
 public/config.js
-
 public/Game.js.map
 public/Game.js
+
+server/**/*.js.map
+server/**/*.js
+server/typings
+
+app.js
+app.js.map
