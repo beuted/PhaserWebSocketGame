@@ -12,10 +12,9 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 
 ## Setup project
 * [Install node](https://nodejs.org/)
-* In `/` Type `npm install`
-* In `public/` type `bower install` (You will need bower installed `npm install -g bower`)
-* In `/` just type `grunt` (that will retried the tsd files and build the typescript of the server and the client)
-* In `/` start the server with `node app.js`
+* At the root of the repo Type `npm install`
+* Type `grunt` and wait few seconds (that will retieve the bower dependencies, retrieve the .d.ts files and build the typescript of the server and the client)
+* Start the server with `node app.js`
 * Connect to `localhost:3000` with as many browsers as you want!
 
 ## Technos used

@@ -1,5 +1,14 @@
 module.exports = function(grunt) {
     grunt.initConfig({
+        bower: {
+            public: {
+                options: {
+                    targetDir: "./public/bower_components/",
+                    cleanBowerDir: true
+                }
+            }
+        },
+
         ts: {
             public : {
                 options: {
@@ -31,8 +40,9 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.loadNpmTasks("grunt-ts");
-    grunt.loadNpmTasks("grunt-tsd");
+    grunt.loadNpmTasks('grunt-bower-task');
+    grunt.loadNpmTasks('grunt-ts');
+    grunt.loadNpmTasks('grunt-tsd');
 
-    grunt.registerTask("default", ["tsd:public", "tsd:server", "ts:public", "ts:server"]);
+    grunt.registerTask('default', ['bower:public', 'tsd:public', 'tsd:server', 'ts:public', 'ts:server']);
 };
