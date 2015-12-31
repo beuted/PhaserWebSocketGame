@@ -14,9 +14,8 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 * [Install node](https://nodejs.org/)
 * In `/` Type `npm install`
 * In `public/` type `bower install` (You will need bower installed `npm install -g bower`)
-* In `public/` type `tsd install` (You will need tsd installed `npm install -g tsd`)
-* In `/` Build the typescript of the client with `grunt:ts` (You will need grunt installed `npm install -g grunt && npm install -g grunt-cli` _you might also have to add it in your path depending on your platform_)
-* In `/` run the server with `node game.js`
+* In `/` just type `grunt` (that will retried the tsd files and build the typescript of the server and the client)
+* In `/` start the server with `node app.js`
 * Connect to `localhost:3000` with as many browsers as you want!
 
 ## Technos used
@@ -24,13 +23,13 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 **In Client**
 * [Phaser](http://www.phaser.io/)
 * [Phaser Isometric Plugin](http://www.rotates.org/phaser/iso/)
-* [Typescript](http://www.typescriptlang.org/)
-* [DefinitlyTyped](http://definitelytyped.org/)
 
-**In Client + Server**
+**In Client & Server**
 * [Lodash](https://lodash.com/)
 * [Requirejs](http://requirejs.org/)
 * [Socket.io](http://socket.io/)
+* [Typescript](http://www.typescriptlang.org/)
+* [DefinitlyTyped](http://definitelytyped.org/)
 
 **In Server**
 * [Nodejs v4.2.2](https://nodejs.org)

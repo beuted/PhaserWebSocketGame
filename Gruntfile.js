@@ -1,8 +1,7 @@
 module.exports = function(grunt) {
-
     grunt.initConfig({
         ts: {
-            client : {
+            public : {
                 options: {
                     module: 'amd'
                 },
@@ -14,9 +13,26 @@ module.exports = function(grunt) {
                 },
                 src: ["app.ts", "server/**/*.ts","!**/*.d.ts"],
             }
+        },
+
+        tsd: {
+            public: {
+                options: {
+                    command: 'reinstall',
+                    config: './public/tsd.json',
+                }
+            },
+            server: {
+                options: {
+                    command: 'reinstall',
+                    config: './server/tsd.json',
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks("grunt-ts");
-    grunt.registerTask("default", ["ts:client", "ts:server"]);
+    grunt.loadNpmTasks("grunt-tsd");
+
+    grunt.registerTask("default", ["tsd:public", "tsd:server", "ts:public", "ts:server"]);
 };

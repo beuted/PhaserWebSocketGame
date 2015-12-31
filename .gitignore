@@ -13,7 +13,11 @@ public/Game.js
 
 server/**/*.js.map
 server/**/*.js
-server/typings
+
+server/typings/**/*.d.ts
+!server/typings/tsd.d.ts
+public/typings/**/*.d.ts
+!public/typings/tsd.d.ts
 
 app.js
 app.js.map
