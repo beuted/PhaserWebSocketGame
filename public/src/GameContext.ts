@@ -15,7 +15,7 @@ export class GameContext {
 
     static init() {
         // using canvas here just because it runs faster for the body debug stuff
-        GameContext.instance = <Phaser.Plugin.Isometric.Game> new Phaser.Game(800, 400, Phaser.CANVAS, 'gameCanvas', null, true, false);
+        GameContext.instance = <Phaser.Plugin.Isometric.Game> new Phaser.Game(1000, 800, Phaser.CANVAS, 'gameCanvas', null, true, false);
         this.debugActivated = false;
     }
 
