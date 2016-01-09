@@ -99,28 +99,19 @@ export class GameEventHandler {
             return;
         }
 
-        // Player should have moved
-        var destinationPoint = pathObject.path[pathObject.path.length - 1];
-        if (destinationPoint &&
-            movePlayer.gridPosition.x == destinationPoint.x &&
-            movePlayer.gridPosition.y == destinationPoint.y
-        ) {
+        // For the moment accept only moves from player without any actions left
+        if (!movePlayer.idle)
             return;
-        }
 
-        // Every case in path should be walkable TODO: check that all moves are from 1 case
-        for (var i = 0; i < pathObject.path.length; i++) {
-            if (!GameEventHandler.map.isCaseWalkable({ x: pathObject.path[i].x, y: pathObject.path[i].y })) {
-                util.log('[Error: "move player"] The requested path isn\'t walkable');
-                return;
-            }
-        }
+        // Every case in path should be walkable and less that 1 tile away
+        Geo.Tools.distance
+        if (Geo.Tools.distance(movePlayer.gridPosition, pathObject.path[0]) > 1 ||
+            !GameEventHandler.map.isPathWalkable(pathObject.path))
+           return;
 
         // Queue the list of actions
-        if (movePlayer.idle) {
-            for (var i = 0; i < pathObject.path.length; i++) {
-                movePlayer.planAction(new Action.Move({ x: pathObject.path[i].x, y: pathObject.path[i].y }));
-            }
+        for (var i = 0; i < pathObject.path.length; i++) {
+            movePlayer.planAction(new Action.Move({ x: pathObject.path[i].x, y: pathObject.path[i].y }));
         }
     }
 

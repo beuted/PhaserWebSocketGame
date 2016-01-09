@@ -7,3 +7,9 @@ export interface IPoint {
     x: number;
     y: number;
 }
+
+export class Tools {
+	static distance(a: IPoint, b: IPoint): number {
+		return Math.abs((a.x - b.x) + (a.y - b.y));
+	}
+}

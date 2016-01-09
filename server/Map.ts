@@ -30,4 +30,18 @@ export class Map {
     public getCase(point: Geo.IPoint): any {
         return this.tiles[point.y][point.x]
     }
+
+    public isPathWalkable(path: Geo.IPoint[]) {
+        // Every case in path should be walkable and distant from one case
+        var prevPoint: Geo.IPoint = null;
+
+        for (var i = 0; i < path.length; i++) {
+            if (!this.isCaseWalkable(path[i]))
+                return false;
+            if (prevPoint && Geo.Tools.distance(path[i], prevPoint) > 1)
+                return false;
+            prevPoint = path[i];
+        }
+        return true;
+    }
 }
