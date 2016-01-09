@@ -28,6 +28,11 @@ export class GameContext {
             Phaser.Keyboard.SPACEBAR
         ]);
 
+        // TODO: (wip) Add loader callbacks
+        GameContext.instance.load.onLoadComplete.add(() => {
+            console.debug("[Loader] Load complete");
+        }, this);
+
         // press space to enter debugmode
         var space = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
         space.onDown.add(function() {
@@ -47,12 +52,6 @@ export class GameContext {
     static update() {
         // update the map
         this.map.update();
-
-        // update the current player if available
-        if (this.player) { this.player.update(); }
-
-        // update the remote players
-        this.remotePlayersManager.update();
     }
 
     static boot(boot: any) {
@@ -61,7 +60,7 @@ export class GameContext {
     }
 
     private static preloadAssets() {
-        GameContext.instance.load.json('map', 'maps/map.json');
+        GameContext.instance.load.json('map-initial', 'maps/map.0.0.json');
         GameContext.instance.load.atlasJSONHash('tileset', 'assets/tileset.png', 'assets/tileset.json');
         GameContext.instance.load.image('cube', 'assets/cube.png');
         GameContext.instance.load.spritesheet('fairy_anim', 'assets/fairy.png', 96, 96, 16);

@@ -23,7 +23,7 @@ interface Plateau {
     tiles: number[][];
     sizeX: number;
     sizeY: number;
-    blocking: number[];
+    walkables: number[];
     opaque: number[];
 }
 
@@ -39,9 +39,11 @@ export class Map {
     private tileArray: string[];
     private water: Phaser.Plugin.Isometric.IsoSprite[];
 
+    private easystar: EasyStar.js;
+
     constructor() {
         // init plateau
-        this.plateau = GameContext.instance.cache.getJSON('map');
+        this.plateau = GameContext.instance.cache.getJSON('map-initial');
 
         //init water & plateauTiles
         this.water = [];
@@ -70,6 +72,11 @@ export class Map {
         Map.isoGroup.enableBody = true;
         Map.isoGroup.physicsBodyType = Phaser.Plugin.Isometric.ISOARCADE;
 
+        // init path finding
+        this.easystar = new EasyStar.js();
+        this.easystar.setGrid(this.plateau.tiles);
+        this.easystar.setAcceptableTiles(this.plateau.walkables);
+
         this.initPlateau();
     }
 
@@ -84,10 +91,10 @@ export class Map {
         return line[point.x];
     }
 
-    public isCaseAccessible(point: Phaser.Point) {
+    public isCaseWalkable(point: Phaser.Point) {
         // collision handling
         var destTile: TileType = this.getPlateau(point);
-        if (_.includes(this.plateau.blocking, destTile)) {
+        if (!_.includes(this.plateau.walkables, destTile)) {
             return false;
         }
 
@@ -96,6 +103,27 @@ export class Map {
             return false;
 
         return true;
+    }
+
+    public findPath(fromPoint: Phaser.Point, toPoint: Phaser.Point): Q.Promise<any[]> {
+        var deferred: Q.Deferred<any[]> = Q.defer<any[]>();
+        this.easystar.findPath(fromPoint.x, fromPoint.y, toPoint.x, toPoint.y, function(path: any[]) {
+            if (path === null) {
+                deferred.reject("Path returned by easystar is null");
+                return;
+            }
+
+            if (path.length <= 1) {
+                deferred.reject("Path returned by easystar has size of 0 or 1");
+                return;
+            }
+
+            path.shift(); // remove the first element which is not a move
+            deferred.resolve(path);
+        });
+        this.easystar.calculate();
+
+        return deferred.promise;
     }
 
     public isCaseOpaque(point: Phaser.Point) {
@@ -113,6 +141,20 @@ export class Map {
     }
 
     public update() {
+        // TODO: (wip) Check if the player is out of the map
+/*        if (!this.isLoading && GameContext.player) {
+            if (GameContext.player.gridPosition.x == 0) {
+                console.log("hey I'm in x = " + GameContext.player.gridPosition.x);
+                GameContext.instance.load.json('map.-1.0', 'maps/map.0.0.json');
+                GameContext.instance.load.start();
+
+                //this.plateau = GameContext.instance.cache.getJSON('map.-1.0');
+                GameContext.player.moveInstant(new Phaser.Point(this.plateau.sizeX - 1, GameContext.player.gridPosition.y));
+
+                this.isLoading = true;
+            }
+        }*/
+
         // make the water move nicely
         this.water.forEach(function(w) {
             w.isoZ = (-2 * Math.sin((GameContext.instance.time.now + (w.isoX * 7)) * 0.004)) + (-1 * Math.sin((GameContext.instance.time.now + (w.isoY * 8)) * 0.005));

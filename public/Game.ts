@@ -41,11 +41,17 @@ export class Game {
         GameContext.boot(BasicGame.Boot);
 
         //TODO: this should be in a class handling current player actions
-        function movePlayer(point: Phaser.Point) {
-            if (!point || GameContext.player.movesToPerform.length || GameContext.remotePlayersManager.arePresentAt(point) || !GameContext.map.isCaseAccessible(point))
+        function movePlayer(toPoint: Phaser.Point) {
+            if (!toPoint || GameContext.remotePlayersManager.arePresentAt(toPoint))
                 return;
 
-            GameContext.socketManager.requestPlayerMove(point);
+            GameContext.map.findPath(GameContext.player.gridPosition, toPoint)
+            .then((path: any[]) => {
+                GameContext.socketManager.requestPlayerMove(path);
+            })
+            .catch((error: string) => {
+                console.debug("[movePlayer] Could not find path to point: (" + toPoint.x + ", " + toPoint.y + ") : " + error);
+            })
         }
     }
 }

@@ -8,9 +8,6 @@ export class Player {
     public gridPosition: Phaser.Point;
     public visionRadius: number;
     public id: string;
-    public movesToPerform: number[][];
-
-    private isMoving: boolean;
 
     constructor(startX: number, startY: number, id: string, current: boolean = false) {
         // setting up the sprite
@@ -28,30 +25,22 @@ export class Player {
         // setting up custom parameters
         this.gridPosition = new Phaser.Point(startX, startY);
         this.visionRadius = 7;
-        this.isMoving = false;
         this.id = id;
-
-        this.movesToPerform = [];
     }
 
-    move(path: number[][]) {
-        this.movesToPerform = this.movesToPerform.concat(path)
+    public move(destPoint: any) {
+        this.gridPosition.x = destPoint.x;
+        this.gridPosition.y = destPoint.y;
+        GameContext.instance.add.tween(this.sprite.body).to({ x: destPoint.x * 32, y: destPoint.y * 32 }, 250, Phaser.Easing.Linear.None, true)
     }
 
-    update() {
-        if (this.movesToPerform.length && !this.isMoving) {
-            this.isMoving = true;
-            this.gridPosition.x = this.movesToPerform[0][0];
-            this.gridPosition.y = this.movesToPerform[0][1];
-            GameContext.instance.add.tween(this.sprite.body).to({ x: this.movesToPerform[0][0] * 32, y: this.movesToPerform[0][1] * 32}, 250, Phaser.Easing.Linear.None, true)
-                .onComplete.add(function() {
-                    this.isMoving = false;
-                    this.movesToPerform.shift();
-                }, this);
-        }
+    public moveInstant(point: Phaser.Point) {
+        this.gridPosition = point;
+        this.sprite.body.x = point.x * 32;
+        this.sprite.body.y = point.y * 32;
     }
 
-    destroy() {
+    public destroy() {
         this.sprite.destroy();
     }
 }

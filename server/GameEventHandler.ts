@@ -2,36 +2,22 @@
 
 import * as util from "util";
 import * as _ from "lodash";
-import {Player} from "./Player";
+import * as Action from "./Action";
 import * as Geo from "./Geo";
+import {Player} from "./Player";
+import {Map} from "./Map"
 import {Server} from "./Server"
-
-var PF = require("pathfinding");
 
 export class GameEventHandler {
     private static players: Player[]
-    private static map;
+    private static map: Map;
     private static finder
 
     constructor() {
-        // init pathfind
-        GameEventHandler.finder = new PF.AStarFinder();
-
         // Load the map
-        GameEventHandler.map = require('../public/maps/map');
+        GameEventHandler.map = new Map('../public/maps/map');
 
-        // init walkable Map
-        var walkableMatrix = [];
-        for (var y = 0; y < GameEventHandler.map.sizeY; y++) {
-            walkableMatrix.push([]);
-            for (var x = 0; x < GameEventHandler.map.sizeX; x++) {
-                walkableMatrix[y].push(_.includes(GameEventHandler.map.blocking, GameEventHandler.map.tiles[y][x]) ? 1 : 0);
-            }
-        }
-
-        GameEventHandler.map.walkableGrid = new PF.Grid(walkableMatrix);
-
-        // TODO: this shoudl be somewhere else
+        // TODO: this should be somewhere else
         GameEventHandler.players = [];
     }
 
@@ -51,7 +37,7 @@ export class GameEventHandler {
         socket.on('new player', GameEventHandler.onNewPlayer);
 
         // Listen for move player message
-        socket.on('move player', GameEventHandler.onMovePlayer);
+        socket.on('move player', GameEventHandler.onMoveRequest);
     }
 
     // Socket client has disconnected
@@ -71,6 +57,9 @@ export class GameEventHandler {
         // Remove player from players array
         GameEventHandler.players.splice(GameEventHandler.players.indexOf(removePlayer), 1);
 
+        // Destroy Player object
+        removePlayer.destroy();
+
         // Broadcast removed player to connected socket clients
         socket.broadcast.emit('remove player', { id: socket.id });
     }
@@ -80,7 +69,7 @@ export class GameEventHandler {
         var socket: SocketIO.Socket = <any>this;
 
         // Create a new player
-        var newPlayer: Player = new Player(new Geo.Point(data.x, data.y));
+        var newPlayer: Player = new Player({ x: data.x, y: data.y });
         newPlayer.id = socket.id;
 
         // Broadcast new player to connected socket clients
@@ -98,41 +87,41 @@ export class GameEventHandler {
     }
 
     // Player has moved
-    private static onMovePlayer(data) {
+    private static onMoveRequest(pathObject) {
         var socket: SocketIO.Socket = <any>this;
 
         // Find player in array
         var movePlayer: Player = GameEventHandler.playerById(socket.id);
 
-        // Player not found
+        // Player should exist
         if (!movePlayer) {
             util.log('[Error: "move player"] Player not found: ' + socket.id);
             return;
         }
 
-        if (movePlayer.gridPosition.x == data.x && movePlayer.gridPosition.y == data.y) {
+        // Player should have moved
+        var destinationPoint = pathObject.path[pathObject.path.length - 1];
+        if (destinationPoint &&
+            movePlayer.gridPosition.x == destinationPoint.x &&
+            movePlayer.gridPosition.y == destinationPoint.y
+        ) {
             return;
         }
 
-        //var destTile = map.tiles[data.y][data.x];
-        var path = GameEventHandler.finder.findPath(movePlayer.gridPosition.x, movePlayer.gridPosition.y, data.x, data.y, GameEventHandler.map.walkableGrid.clone());
-        if (!path.length) {
-            util.log('[Debug: "move player"] Player ' + socket.id + ' can\'t moved : (' + movePlayer.gridPosition.x + ', ' + movePlayer.gridPosition.y + ')=>(' + data.x + ', ' + data.y + ')');
-            return;
+        // Every case in path should be walkable TODO: check that all moves are from 1 case
+        for (var i = 0; i < pathObject.path.length; i++) {
+            if (!GameEventHandler.map.isCaseWalkable({ x: pathObject.path[i].x, y: pathObject.path[i].y })) {
+                util.log('[Error: "move player"] The requested path isn\'t walkable');
+                return;
+            }
         }
 
-        // remove the first element which is not a move
-        path.shift();
-
-        util.log('[Debug: "move player"] Player ' + socket.id + ' moved : (' + movePlayer.gridPosition.x + ', ' + movePlayer.gridPosition.y + ')=>(' + data.x + ', ' + data.y + ')');
-
-        // Update player position
-        movePlayer.gridPosition.x = data.x;
-        movePlayer.gridPosition.y = data.y;
-
-        // Broadcast updated position to connected socket clients
-        socket.broadcast.emit('move player', { id: movePlayer.id, path: path });
-        socket.emit('move player', { id: movePlayer.id, path: path });
+        // Queue the list of actions
+        if (movePlayer.idle) {
+            for (var i = 0; i < pathObject.path.length; i++) {
+                movePlayer.planAction(new Action.Move({ x: pathObject.path[i].x, y: pathObject.path[i].y }));
+            }
+        }
     }
 
 

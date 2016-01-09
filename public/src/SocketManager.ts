@@ -17,9 +17,8 @@ export class SocketManager {
         this.socket.on("remove player", this.onRemovePlayer.bind(this));    // Player removed message received
     }
 
-    public requestPlayerMove(point: Phaser.Point) {
-        console.debug("sent move request: " + point.x + ", " + point.y);
-        this.socket.emit("move player", { x: point.x, y: point.y });
+    public requestPlayerMove(path: any[]) {
+        this.socket.emit("move player", { path: path });
     }
 
 
@@ -53,11 +52,11 @@ export class SocketManager {
     // Move player
     private onMovePlayer(data: any) {
         if (GameContext.player.id === data.id) {
-            GameContext.player.move(data.path);
+            GameContext.player.move(data.position);
             return;
         }
 
-        GameContext.remotePlayersManager.moveById(data.id, data.path)
+        GameContext.remotePlayersManager.moveById(data.id, data.position)
     };
 
     // Remove player

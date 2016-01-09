@@ -10,12 +10,6 @@ export class RemotePlayersManager {
         this.remotePlayers = [];
     }
 
-    public update() {
-        this.remotePlayers.forEach(function(p: Player) {
-            p.update();
-        });
-    }
-
     public add(p: Player) {
         this.remotePlayers.push(p);
     }
@@ -34,7 +28,7 @@ export class RemotePlayersManager {
         this.remotePlayers.splice(this.remotePlayers.indexOf(removePlayer), 1);
     }
 
-    public moveById(id: number, path: number[][]) {
+    public moveById(id: number, destPoint: any) {
         var playerToMove = this.playerById(id);
 
         if (!playerToMove) {
@@ -43,7 +37,7 @@ export class RemotePlayersManager {
         };
 
         // Update player position
-        playerToMove.move(path)
+        playerToMove.move(destPoint)
     }
 
     public arePresentAt(point: Phaser.Point) {
