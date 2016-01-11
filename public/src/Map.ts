@@ -21,6 +21,7 @@ export enum TileType {
 
 interface Plateau {
     tiles: number[][];
+    coord: { x: number, y: number };
     sizeX: number;
     sizeY: number;
     walkables: number[];
@@ -31,6 +32,7 @@ export class Map {
     // TODO: should be private once character will be handle by the Map
     public static isoGroup: Phaser.Group;
     public selectedTileGridCoord: Phaser.Point;
+    public coord: Phaser.Point;
 
     private static tileSize = 32;
 
@@ -42,13 +44,8 @@ export class Map {
     private easystar: EasyStar.js;
 
     constructor() {
-        // init plateau
-        this.plateau = GameContext.instance.cache.getJSON('map-initial');
-
-        //init water & plateauTiles
-        this.water = [];
-        this.plateauTiles = [];
         this.selectedTileGridCoord = null;
+        this.coord = new Phaser.Point(0, 0);
 
         // init tileArray
         this.tileArray = [];
@@ -74,8 +71,6 @@ export class Map {
 
         // init path finding
         this.easystar = new EasyStar.js();
-        this.easystar.setGrid(this.plateau.tiles);
-        this.easystar.setAcceptableTiles(this.plateau.walkables);
 
         this.initPlateau();
     }
@@ -195,7 +190,31 @@ export class Map {
         GameContext.instance.iso.topologicalSort(Map.isoGroup);
     }
 
-    private initPlateau() {
+    public getPlateauTile(point: Phaser.Point) {
+        return this.plateauTiles[point.x + point.y * this.plateau.sizeX];
+    }
+
+    public initPlateau() {
+        // Update the map only if the plateau has changed
+        if (this.plateau && this.plateau.coord.x == this.coord.x && this.plateau.coord.y == this.coord.y)
+            return;
+
+        this.plateau = GameContext.instance.cache.getJSON('map.' + this.coord.x + '.' + this.coord.y);
+
+        // remove old tiles
+        if (this.plateauTiles)
+            this.plateauTiles.forEach(function(tile: Phaser.Plugin.Isometric.IsoSprite) {
+                tile.destroy();
+            });
+
+        // init water & plateauTiles
+        this.water = [];
+        this.plateauTiles = [];
+
+        // init pathfinding
+        this.easystar.setGrid(this.plateau.tiles);
+        this.easystar.setAcceptableTiles(this.plateau.walkables);
+
         var tile;
         var point: Phaser.Point = new Phaser.Point(0, 0);
         for (point.y = 0; point.y < this.plateau.sizeY; point.y++) {
@@ -214,7 +233,10 @@ export class Map {
         }
     }
 
-    public getPlateauTile(point: Phaser.Point) {
-        return this.plateauTiles[point.x + point.y * this.plateau.sizeX];
+    public changeMap(coord: Phaser.Point) {
+        this.coord = coord;
+        GameContext.instance.load.json('map.' + coord.x + '.' + coord.y, 'maps/map.' + coord.x + '.' + coord.y + '.json');
+        GameContext.instance.load.start();
     }
+
 }

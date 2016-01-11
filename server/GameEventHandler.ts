@@ -5,17 +5,18 @@ import * as _ from "lodash";
 import * as Action from "./Action";
 import * as Geo from "./Geo";
 import {Player} from "./Player";
-import {Map} from "./Map"
-import {Server} from "./Server"
+import {Map} from "./Map";
+import {MapsHandler} from "./MapsHandler";
+import {Server} from "./Server";
 
 export class GameEventHandler {
-    private static players: Player[]
-    private static map: Map;
-    private static finder
+    public static players: Player[];
+    public static mapsHandler: MapsHandler;
+    //public static playerHandler: PlayersHandler;
 
     constructor() {
-        // Load the map
-        GameEventHandler.map = new Map('../public/maps/map');
+        // Init mapsHandler
+        GameEventHandler.mapsHandler = new MapsHandler();
 
         // TODO: this should be somewhere else
         GameEventHandler.players = [];
@@ -106,8 +107,10 @@ export class GameEventHandler {
         // Every case in path should be walkable and less that 1 tile away
         Geo.Tools.distance
         if (Geo.Tools.distance(movePlayer.gridPosition, pathObject.path[0]) > 1 ||
-            !GameEventHandler.map.isPathWalkable(pathObject.path))
+            !movePlayer.map.isPathWalkable(pathObject.path)) {
+           util.log('[Error: "move player"] Player ' + socket.id + ' asked for non-walkable path');
            return;
+       }
 
         // Queue the list of actions
         for (var i = 0; i < pathObject.path.length; i++) {

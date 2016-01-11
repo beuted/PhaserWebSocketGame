@@ -34,10 +34,11 @@ export class Player {
         GameContext.instance.add.tween(this.sprite.body).to({ x: destPoint.x * 32, y: destPoint.y * 32 }, 250, Phaser.Easing.Linear.None, true)
     }
 
-    public moveInstant(point: Phaser.Point) {
-        this.gridPosition = point;
-        this.sprite.body.x = point.x * 32;
-        this.sprite.body.y = point.y * 32;
+    public moveInstant(destPoint: Phaser.Point) {
+        this.gridPosition = destPoint;
+        this.sprite.x = destPoint.x * 32;
+        this.sprite.y = destPoint.y * 32;
+        //GameContext.instance.add.tween(this.sprite.body).to({ x: destPoint.x * 32, y: destPoint.y * 32 }, 250, Phaser.Easing.Linear.None, true)
     }
 
     public destroy() {

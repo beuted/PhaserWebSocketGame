@@ -14,6 +14,7 @@ export class SocketManager {
         this.socket.on("disconnect", this.onSocketDisconnect.bind(this));   // Socket disconnection
         this.socket.on("new player", this.onNewPlayer.bind(this));          // New player message received
         this.socket.on("move player", this.onMovePlayer.bind(this));        // Player move message received
+        this.socket.on("change map player", this.onChangeMapPlayer.bind(this));    // Player removed message received
         this.socket.on("remove player", this.onRemovePlayer.bind(this));    // Player removed message received
     }
 
@@ -31,12 +32,12 @@ export class SocketManager {
 
         // Send local player data to the game server
         this.socket.emit("new player", { x: GameContext.player.gridPosition.x, y: GameContext.player.gridPosition.y });
-    };
+    }
 
     // Socket disconnected
     private onSocketDisconnect() {
         console.debug("Disconnected from socket server");
-    };
+    }
 
     // New player
     private onNewPlayer(data: any) {
@@ -47,7 +48,7 @@ export class SocketManager {
 
         // Add new player to the remote players array
         GameContext.remotePlayersManager.add(newPlayer);
-    };
+    }
 
     // Move player
     private onMovePlayer(data: any) {
@@ -57,11 +58,20 @@ export class SocketManager {
         }
 
         GameContext.remotePlayersManager.moveById(data.id, data.position)
-    };
+    }
 
-    // Remove player
+    // Player changed map
+    private onChangeMapPlayer(data: { id: string, gridPosition: { x: number, y: number }, mapPosition: { x: number, y: number } }) {
+        if (GameContext.player.id === data.id) {
+            console.log("Player changed map : " + JSON.stringify(data));
+            GameContext.map.changeMap(new Phaser.Point(data.mapPosition.x, data.mapPosition.y));
+            GameContext.player.moveInstant(new Phaser.Point(data.gridPosition.x, data.gridPosition.y));
+        }
+    }
+
+        // Remove player
     private onRemovePlayer(data: any) {
         // Remove player from remotePlayers
         GameContext.remotePlayersManager.removeById(data.id)
-    };
+    }
 }
