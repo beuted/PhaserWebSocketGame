@@ -5,7 +5,7 @@
 This Project aim to be bootstrap Phaser project for turn based isometric games where the player in moving on a grid.
 
 ## Features
-* Grid Map saved as Json rendered with _isometric tiles_
+* Grid Map saved as Json file*s* rendered with _isometric tiles_
 * _Multiplayer_ enabled using socket.io (the players can see eachothers moving on the map)
 * Movement enabled by clicking using an _A\* pathfinding **client side**_
 * Feild of view of the player computed with a _recursive shadowcasting_
