@@ -7,7 +7,7 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 ## Features
 * Grid Map saved as Json rendered with _isometric tiles_
 * _Multiplayer_ enabled using socket.io (the players can see eachothers moving on the map)
-* Movement enabled by clicking using an _A\* pathfinding **server side**_
+* Movement enabled by clicking using an _A\* pathfinding **client side**_
 * Feild of view of the player computed with a _recursive shadowcasting_
 
 ## Setup project
@@ -22,6 +22,7 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 **In Client**
 * [Phaser](http://www.phaser.io/)
 * [Phaser Isometric Plugin](http://www.rotates.org/phaser/iso/)
+* [easystar.js](http://www.easystarjs.com/)
 
 **In Client & Server**
 * [Lodash](https://lodash.com/)
@@ -33,7 +34,6 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 **In Server**
 * [Nodejs v4.2.2](https://nodejs.org)
 * [Express](http://expressjs.com/)
-* [PathFinding.js](https://github.com/qiao/PathFinding.js/)
 
 ## Licence
 **MIT**
