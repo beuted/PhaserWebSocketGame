@@ -7,19 +7,18 @@ import * as Geo from "./Geo";
 import {Player} from "./Player";
 import {Map} from "./Map";
 import {MapsHandler} from "./MapsHandler";
+import {PlayersHandler} from "./PlayersHandler";
 import {Server} from "./Server";
 
 export class GameEventHandler {
-    public static players: Player[];
     public static mapsHandler: MapsHandler;
-    //public static playerHandler: PlayersHandler;
+    public static playersHandler: PlayersHandler;
 
     constructor() {
         // Init mapsHandler
         GameEventHandler.mapsHandler = new MapsHandler();
 
-        // TODO: this should be somewhere else
-        GameEventHandler.players = [];
+        GameEventHandler.playersHandler = new PlayersHandler();
     }
 
     public setEventHandlers() {
@@ -47,19 +46,8 @@ export class GameEventHandler {
 
         util.log('Player has disconnected: ' + socket.id);
 
-        var removePlayer = GameEventHandler.playerById(socket.id);
-
-        // Player not found
-        if (!removePlayer) {
-            util.log('[Error: "remove player"] Player not found: ' + socket.id);
-            return;
-        };
-
-        // Remove player from players array
-        GameEventHandler.players.splice(GameEventHandler.players.indexOf(removePlayer), 1);
-
-        // Destroy Player object
-        removePlayer.destroy();
+        // Remove player from playersHandler
+        GameEventHandler.playersHandler.removePlayer(socket.id);
 
         // Broadcast removed player to connected socket clients
         socket.broadcast.emit('remove player', { id: socket.id });
@@ -78,13 +66,14 @@ export class GameEventHandler {
 
         // Send existing players to the new player
         var existingPlayer: Player;
-        for (var i = 0; i < GameEventHandler.players.length; i++) {
-            existingPlayer = GameEventHandler.players[i];
+        var players = GameEventHandler.playersHandler.getPlayers();
+        for (var i = 0; i < players.length; i++) {
+            existingPlayer = players[i];
             socket.emit('new player', { id: existingPlayer.id, x: existingPlayer.gridPosition.x, y: existingPlayer.gridPosition.y });
         };
 
         // Add new player to the players array
-        GameEventHandler.players.push(newPlayer);
+        GameEventHandler.playersHandler.addPlayer(newPlayer);
     }
 
     // Player has moved
@@ -92,7 +81,7 @@ export class GameEventHandler {
         var socket: SocketIO.Socket = <any>this;
 
         // Find player in array
-        var movePlayer: Player = GameEventHandler.playerById(socket.id);
+        var movePlayer: Player = GameEventHandler.playersHandler.getPlayer(socket.id);
 
         // Player should exist
         if (!movePlayer) {
@@ -116,16 +105,5 @@ export class GameEventHandler {
         for (var i = 0; i < pathObject.path.length; i++) {
             movePlayer.planAction(new Action.Move({ x: pathObject.path[i].x, y: pathObject.path[i].y }));
         }
-    }
-
-
-    // Find player by ID
-    private static playerById(id: string): Player {
-        for (var i = 0; i < GameEventHandler.players.length; i++) {
-            if (GameEventHandler.players[i].id == id)
-                return GameEventHandler.players[i];
-        };
-
-        return null;
     }
 }

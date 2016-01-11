@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as Geo from "./Geo";
 import {GameEventHandler} from "./GameEventHandler";
 import {Player} from "./Player";
@@ -16,13 +17,12 @@ export class Move implements IAction {
 
     public execute(player: Player) {
         player.gridPosition = this.destination;
-        for (var i = 0; i < GameEventHandler.players.length; i++) {
-            if (GameEventHandler.players[i].mapPosition.x == player.mapPosition.x && GameEventHandler.players[i].mapPosition.y == player.mapPosition.y) {
-                Server.io.sockets.connected[GameEventHandler.players[i].id].emit('move player', {
+        var playersToNotify: Player[] = GameEventHandler.playersHandler.getPlayersOnMap(player.mapPosition);
+        _.forEach(playersToNotify, function(notifiedPlayer) {
+            Server.io.sockets.connected[notifiedPlayer.id].emit('move player', {
                     id: player.id,
                     position: { x: this.destination.x, y: this.destination.y }
                 });
-            }
-        }
+        }, this);
     }
 }
