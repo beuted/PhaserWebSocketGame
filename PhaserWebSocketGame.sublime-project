@@ -4,7 +4,7 @@
         {
             "path": ".",
             "folder_exclude_patterns": [".git", ".tscache", "node_modules", "public/bower_components", "public/vendors"],
-            "file_exclude_patterns": ["public/*.js", "public/*.js.map", "app.js", "app.js.map"]
+            "file_exclude_patterns": ["public/*.js", "public/*.js.map","server/*.js", "server/*.js.map", "app.js", "app.js.map"]
         }
 	],
     "settings":
