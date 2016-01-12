@@ -2,7 +2,7 @@
   "name": "one-day-to-live",
   "version": "1.0.0",
   "description": "",
-  "main": "game.js",
+  "main": "app.js",
   "dependencies": {
     "express": "^4.13.3",
     "lodash": "^3.10.1",
@@ -11,6 +11,9 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-bower-task": "^0.4.0",
+    "grunt-concurrent": "^2.1.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-nodemon": "^0.4.1",
     "grunt-ts": "^5.2.0",
     "grunt-tsd": "^0.1.0"
   },
