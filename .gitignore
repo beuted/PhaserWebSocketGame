@@ -2,9 +2,11 @@ node_modules
 .tscache
 old
 
+
 public/bower_components
 public/src/**/*.js.map
 public/src/**/*.js
+**/*.sublime-workspace
 
 public/config.js.map
 public/config.js
@@ -18,6 +20,7 @@ server/typings/**/*.d.ts
 !server/typings/tsd.d.ts
 public/typings/**/*.d.ts
 !public/typings/tsd.d.ts
+!public/typings/typings_custom/
 
 app.js
 app.js.map
