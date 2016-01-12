@@ -35,5 +35,12 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 * [Nodejs v4.2.2](https://nodejs.org)
 * [Express](http://expressjs.com/)
 
+## Development grunt commands
+* `grunt ts:public`: Compile the typescript client files
+* `grunt ts:server`: Compile the typescript server files
+* `grunt dev-server`: Run a watch on the server files, compiling the typescript files and restarting the node server
+* `grunt dev-public`: Run a watch on the client files, compiling the typescript files
+* `grunt dev`: Run both watches
+
 ## Licence
 **MIT**

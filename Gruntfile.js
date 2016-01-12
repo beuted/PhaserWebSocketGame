@@ -71,8 +71,14 @@ module.exports = function(grunt) {
         },
 
         concurrent: {
-            watchers: {
+            allWatchs: {
                 tasks: ['nodemon:server', 'watch:tsServer', 'watch:tsPublic'],
+                options: {
+                    logConcurrentOutput: true
+                }
+            },
+            serverWatchs: {
+                tasks: ['nodemon:server', 'watch:tsServer'],
                 options: {
                     logConcurrentOutput: true
                 }
@@ -88,5 +94,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-tsd');
 
     grunt.registerTask('default', ['bower:public', 'tsd:public', 'tsd:server', 'ts:public', 'ts:server']);
-    grunt.registerTask('dev', ['concurrent:watchers']);
+    grunt.registerTask('dev', ['concurrent:allWatchs']);
+    grunt.registerTask('dev-public', ['watch:tsPublic']);
+    grunt.registerTask('dev-server', ['concurrent:serverWatchs']);
 };
