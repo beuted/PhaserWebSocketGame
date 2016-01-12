@@ -10,6 +10,9 @@
     },
     "lodash/lodash.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
+    },
+    "q/Q.d.ts": {
+      "commit": "faa49cc68025118355b677b936892435b9be7247"
     }
   }
 }
