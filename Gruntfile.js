@@ -3,7 +3,7 @@ module.exports = function(grunt) {
         bower: {
             public: {
                 options: {
-                    targetDir: "./public/bower_components/",
+                    targetDir: './public/bower_components/',
                     cleanBowerDir: true
                 }
             }
@@ -14,13 +14,13 @@ module.exports = function(grunt) {
                 options: {
                     module: 'amd'
                 },
-                src: ["public/**/*.ts", "!**/*.d.ts"]
+                src: ['public/**/*.ts', '!**/*.d.ts']
             },
             server : {
                 options: {
                     module: 'commonjs'
                 },
-                src: ["app.ts", "server/**/*.ts","!**/*.d.ts"]
+                src: ['app.ts', 'server/**/*.ts','!**/*.d.ts']
             }
         },
 
@@ -82,10 +82,11 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-bower-task');
     grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks("grunt-concurrent");
+    grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-tsd');
 
     grunt.registerTask('default', ['bower:public', 'tsd:public', 'tsd:server', 'ts:public', 'ts:server']);
+    grunt.registerTask('dev', ['concurrent:watchers']);
 };
