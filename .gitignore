@@ -20,7 +20,7 @@ server/typings/**/*.d.ts
 !server/typings/tsd.d.ts
 public/typings/**/*.d.ts
 !public/typings/tsd.d.ts
-!public/typings/typings_custom/
+!public/typings/typings_custom/*.d.ts
 
 app.js
 app.js.map
