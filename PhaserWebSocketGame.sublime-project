@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+        {
+            "path": ".",
+            "folder_exclude_patterns": [".git", ".tscache", "node_modules", "public/bower_components", "public/vendors"],
+            "file_exclude_patterns": ["public/*.js", "public/*.js.map", "app.js", "app.js.map"]
+        }
+	],
+    "settings":
+    {
+        "tab_size": 4,
+        "translate_tabs_to_spaces": true,
+        "trim_trailing_white_space_on_save": true,
+    },
+}
