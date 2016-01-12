@@ -3,6 +3,7 @@
 // Player class, this aim to be as close as possible as the client version of this class
 // Maybe we could share a common interface between back and front ?
 
+import * as _ from "lodash";
 import * as Geo from "./Geo";
 import * as Action from "./Action";
 import {Map} from "./Map";
@@ -38,6 +39,10 @@ export class Player {
         return GameEventHandler.mapsHandler.getMap(this.mapPosition)
     }
 
+    public toMessage(): any {
+        return _.pick(this, ["id", "gridPosition"]);
+    }
+
     public planAction(action: Action.IAction) {
        this.actionQueue.push(action);
     }
@@ -59,40 +64,53 @@ export class Player {
     public update() {
         // Change player map if player as reach map borders in it's last action
         var mapSize: Geo.IPoint = this.map.size;
-        var oldMapPosition: Geo.IPoint = { x: this.mapPosition.x, y: this.mapPosition.y }
-        var oldGridPosition: Geo.IPoint = { x: this.gridPosition.x, y: this.gridPosition.y }
+        var newMapPosition: Geo.IPoint = { x: this.mapPosition.x, y: this.mapPosition.y }
+        var newGridPosition: Geo.IPoint = { x: this.gridPosition.x, y: this.gridPosition.y }
 
         if (this.actionQueue.length !== 0)
             return;
 
         if (this.gridPosition.x <= 0) {
-            this.mapPosition.x--;
-            this.gridPosition.x = mapSize.x - 1;
+            newMapPosition.x--;
+            newGridPosition.x = mapSize.x - 1;
         } else if (this.gridPosition.x >= mapSize.x - 1) {
-            this.mapPosition.x++;
-            this.gridPosition.x = 0;
+            newMapPosition.x++;
+            newGridPosition.x = 0;
         }
 
         if (this.gridPosition.y <= 0) {
-            this.mapPosition.y--;
-            this.gridPosition.y = mapSize.y - 1;
+            newMapPosition.y--;
+            newGridPosition.y = mapSize.y - 1;
         } else if (this.gridPosition.y >= mapSize.y - 1) {
-            this.mapPosition.y++;
-            this.gridPosition.y = 0;
+            newMapPosition.y++;
+            newGridPosition.y = 0;
         }
 
-        // TODO: limit maps for the moment
-        if (this.mapPosition.x < -1 || this.mapPosition.x > 1 || this.mapPosition.y < -1 || this.mapPosition.y > 1) {
-            this.mapPosition = oldMapPosition;
-            this.gridPosition = oldGridPosition;
-        }
+        if ((this.mapPosition.x != newMapPosition.x || this.mapPosition.y != newMapPosition.y) &&
+            newMapPosition.x >= -1 && newMapPosition.x <= 1 && newMapPosition.y >= -1 && newMapPosition.y <= 1/* TODO: limit maps for the moment*/) {
+            var playersOnPrevMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(this.mapPosition, this.id);
+            var playersOnDestMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(newMapPosition, this.id);
+            this.mapPosition = newMapPosition;
+            this.gridPosition = newGridPosition;
 
-        if (oldMapPosition.x !== this.mapPosition.x || oldMapPosition.y !== this.mapPosition.y) {
-            Server.io.sockets.emit('change map player', {
+            // Send the change map message to the player changing map
+            var playersOnDestMapMessage = _.map(playersOnDestMap, player => player.toMessage());
+            Server.io.sockets.connected[this.id].emit('change map player', {
                 id: this.id,
                 gridPosition: { x: this.gridPosition.x, y: this.gridPosition.y },
-                mapPosition: { x: this.mapPosition.x, y: this.mapPosition.y }
+                mapPosition: { x: this.mapPosition.x, y: this.mapPosition.y },
+                players: playersOnDestMapMessage
             });
+
+            // Notify players from previous map
+            _.forEach(playersOnPrevMap, function(notifiedPlayer) {
+                Server.io.sockets.connected[notifiedPlayer.id].emit('remove player', this.toMessage());
+            }, this);
+
+            // Notify players from detination map
+            _.forEach(playersOnDestMap, function(notifiedPlayer) {
+                Server.io.sockets.connected[notifiedPlayer.id].emit('new player', this.toMessage());
+            }, this);
         }
     }
 }

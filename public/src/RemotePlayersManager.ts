@@ -14,7 +14,18 @@ export class RemotePlayersManager {
         this.remotePlayers.push(p);
     }
 
-    public removeById(id: number) {
+    public addFromJson(playerJson: any) {
+        var remotePlayer = new Player(playerJson.gridPosition.x, playerJson.gridPosition.y, playerJson.id);
+        this.add(remotePlayer);
+    }
+
+    public addAllFromJson(playersJson: any[]) {
+        _.forEach(playersJson, function(playerJson: any) {
+            this.addFromJson(playerJson);
+        }, this);
+    }
+
+    public removeById(id: string) {
         var removePlayer = this.playerById(id);
 
         // Player not found
@@ -26,6 +37,13 @@ export class RemotePlayersManager {
         removePlayer.destroy();
 
         this.remotePlayers.splice(this.remotePlayers.indexOf(removePlayer), 1);
+    }
+
+    public removeAll() {
+        _.forEach(this.remotePlayers, function(remotePlayer) {
+            remotePlayer.destroy();
+        });
+        this.remotePlayers = []
     }
 
     public moveById(id: number, destPoint: any) {

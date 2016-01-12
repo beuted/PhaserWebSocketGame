@@ -41,13 +41,10 @@ export class SocketManager {
 
     // New player
     private onNewPlayer(data: any) {
-        console.debug("New player connected: " + data.id);
-
-        // Initialise the new player
-        var newPlayer = new Player(data.x, data.y, data.id);
+        console.debug("New player on map: " + JSON.stringify(data));
 
         // Add new player to the remote players array
-        GameContext.remotePlayersManager.add(newPlayer);
+        GameContext.remotePlayersManager.addFromJson(data);
     }
 
     // Move player
@@ -61,16 +58,21 @@ export class SocketManager {
     }
 
     // Player changed map
-    private onChangeMapPlayer(data: { id: string, gridPosition: { x: number, y: number }, mapPosition: { x: number, y: number } }) {
+    private onChangeMapPlayer(data: { id: string, gridPosition: { x: number, y: number }, mapPosition: { x: number, y: number }, players: any[] }) {
         if (GameContext.player.id === data.id) {
-            console.log("Player changed map : " + JSON.stringify(data));
+            console.debug('Player changed map : ' + JSON.stringify(data));
             GameContext.map.changeMap(new Phaser.Point(data.mapPosition.x, data.mapPosition.y));
             GameContext.player.moveInstant(new Phaser.Point(data.gridPosition.x, data.gridPosition.y));
+            GameContext.remotePlayersManager.removeAll();
+            GameContext.remotePlayersManager.addAllFromJson(data.players);
+        } else {
+            console.error('Player received a "changed map" for another id: ' + JSON.stringify(data));
         }
     }
 
-        // Remove player
+    // Remove player
     private onRemovePlayer(data: any) {
+        console.debug("Player removed from map: " + data.id);
         // Remove player from remotePlayers
         GameContext.remotePlayersManager.removeById(data.id)
     }
