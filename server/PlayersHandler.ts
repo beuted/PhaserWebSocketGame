@@ -19,7 +19,7 @@ export class PlayersHandler {
     public removePlayer(playerId: string) {
         var removePlayer = this.getPlayer(playerId);
         if (!removePlayer) {
-            util.error('[removePlayer] Player not found: ' + playerId);
+            console.error('[removePlayer] Player not found: ' + playerId);
             return;
         }
 
