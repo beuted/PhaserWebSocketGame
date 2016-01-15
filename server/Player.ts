@@ -72,45 +72,25 @@ export class Player {
 
         if (this.gridPosition.x <= 0) {
             newMapPosition.x--;
-            newGridPosition.x = mapSize.x - 1;
+            newGridPosition.x = mapSize.x - 2;
         } else if (this.gridPosition.x >= mapSize.x - 1) {
             newMapPosition.x++;
-            newGridPosition.x = 0;
+            newGridPosition.x = 1;
         }
 
         if (this.gridPosition.y <= 0) {
             newMapPosition.y--;
-            newGridPosition.y = mapSize.y - 1;
+            newGridPosition.y = mapSize.y - 2;
         } else if (this.gridPosition.y >= mapSize.y - 1) {
             newMapPosition.y++;
-            newGridPosition.y = 0;
+            newGridPosition.y = 1;
         }
 
         if ((this.mapPosition.x != newMapPosition.x || this.mapPosition.y != newMapPosition.y) &&
             newMapPosition.x >= -1 && newMapPosition.x <= 1 && newMapPosition.y >= -1 && newMapPosition.y <= 1/* TODO: limit maps for the moment*/) {
-            var playersOnPrevMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(this.mapPosition, this.id);
-            var playersOnDestMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(newMapPosition, this.id);
-            this.mapPosition = newMapPosition;
-            this.gridPosition = newGridPosition;
 
-            // Send the change map message to the player changing map
-            var playersOnDestMapMessage = _.map(playersOnDestMap, player => player.toMessage());
-            Server.io.sockets.connected[this.id].emit('change map player', {
-                id: this.id,
-                gridPosition: { x: this.gridPosition.x, y: this.gridPosition.y },
-                mapPosition: { x: this.mapPosition.x, y: this.mapPosition.y },
-                players: playersOnDestMapMessage
-            });
-
-            // Notify players from previous map
-            _.forEach(playersOnPrevMap, function(notifiedPlayer) {
-                Server.io.sockets.connected[notifiedPlayer.id].emit('remove player', this.toMessage());
-            }, this);
-
-            // Notify players from detination map
-            _.forEach(playersOnDestMap, function(notifiedPlayer) {
-                Server.io.sockets.connected[notifiedPlayer.id].emit('new player', this.toMessage());
-            }, this);
+            var changeMapAction = new Action.ChangeMap(newMapPosition, newGridPosition);
+            this.planAction(changeMapAction);
         }
     }
 }
