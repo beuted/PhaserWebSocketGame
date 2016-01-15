@@ -48,11 +48,14 @@ export class ChangeMap implements IAction {
 
         // Send the change map message to the player changing map
         var playersOnDestMapMessage = _.map(playersOnDestMap, player => player.toMessage());
+        var newMap = GameEventHandler.mapsHandler.getMap(this.destMap);
+
         Server.io.sockets.connected[player.id].emit('change map player', {
             id: player.id,
             gridPosition: { x: player.gridPosition.x, y: player.gridPosition.y },
             mapPosition: { x: player.mapPosition.x, y: player.mapPosition.y },
-            players: playersOnDestMapMessage
+            players: playersOnDestMapMessage,
+            map: newMap
         });
 
         // Notify players from previous map

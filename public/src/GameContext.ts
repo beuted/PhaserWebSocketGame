@@ -31,7 +31,6 @@ export class GameContext {
         // TODO: (wip) Add loader callbacks
         GameContext.instance.load.onLoadComplete.add(() => {
             console.debug("[Loader] Load complete");
-            GameContext.map.initPlateau();
         }, this);
 
         // press space to enter debugmode

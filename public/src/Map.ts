@@ -46,6 +46,7 @@ export class Map {
     constructor() {
         this.selectedTileGridCoord = null;
         this.coord = new Phaser.Point(0, 0);
+        this.plateau = GameContext.instance.cache.getJSON('map.' + this.coord.x + '.' + this.coord.y);
 
         // init tileArray
         this.tileArray = [];
@@ -136,20 +137,6 @@ export class Map {
     }
 
     public update() {
-        // TODO: (wip) Check if the player is out of the map
-/*        if (!this.isLoading && GameContext.player) {
-            if (GameContext.player.gridPosition.x == 0) {
-                console.log("hey I'm in x = " + GameContext.player.gridPosition.x);
-                GameContext.instance.load.json('map.-1.0', 'maps/map.0.0.json');
-                GameContext.instance.load.start();
-
-                //this.plateau = GameContext.instance.cache.getJSON('map.-1.0');
-                GameContext.player.moveInstant(new Phaser.Point(this.plateau.sizeX - 1, GameContext.player.gridPosition.y));
-
-                this.isLoading = true;
-            }
-        }*/
-
         // make the water move nicely
         this.water.forEach(function(w) {
             w.isoZ = (-2 * Math.sin((GameContext.instance.time.now + (w.isoX * 7)) * 0.004)) + (-1 * Math.sin((GameContext.instance.time.now + (w.isoY * 8)) * 0.005));
@@ -195,12 +182,6 @@ export class Map {
     }
 
     public initPlateau() {
-        // Update the map only if the plateau has changed
-        if (this.plateau && this.plateau.coord.x == this.coord.x && this.plateau.coord.y == this.coord.y)
-            return;
-
-        this.plateau = GameContext.instance.cache.getJSON('map.' + this.coord.x + '.' + this.coord.y);
-
         // remove old tiles
         if (this.plateauTiles)
             this.plateauTiles.forEach(function(tile: Phaser.Plugin.Isometric.IsoSprite) {
@@ -233,10 +214,10 @@ export class Map {
         }
     }
 
-    public changeMap(coord: Phaser.Point) {
-        this.coord = coord;
-        GameContext.instance.load.json('map.' + coord.x + '.' + coord.y, 'maps/map.' + coord.x + '.' + coord.y + '.json');
-        GameContext.instance.load.start();
+    public changeMap(mapData: any) {
+        this.coord = mapData.coord;
+        this.plateau = mapData;
+        this.initPlateau();
     }
 
 }

@@ -33,17 +33,17 @@ export class MapsHandler {
         this.maps.add({ x: 0, y: 0 }, map)
     }
 
-    public loadMap(coord: Geo.IPoint): Map {
-        var map: Map = new Map('../public/maps/map.' + coord.x + "." + coord.y);
-        this.maps.add(coord, map);
-        return map;
-    }
-
     // Get the map at @coord, if not found, load it
     public getMap(coord: Geo.IPoint): Map {
         var map = this.maps.get(coord);
         if (!map)
             map = this.loadMap(coord);
+        return map;
+    }
+
+    private loadMap(coord: Geo.IPoint): Map {
+        var map: Map = new Map('../public/maps/map.' + coord.x + "." + coord.y);
+        this.maps.add(coord, map);
         return map;
     }
 

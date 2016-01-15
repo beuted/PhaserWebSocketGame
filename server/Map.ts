@@ -9,6 +9,7 @@ export class Map {
     private sizeY: number;
     private walkables: number[];
     private opaque: number[];
+    private coord: Geo.IPoint;
 
     constructor(file: string) {
         var mapJson: any = require(file);
@@ -17,6 +18,7 @@ export class Map {
         this.sizeY = mapJson.sizeY
         this.walkables = mapJson.walkables
         this.opaque = mapJson.opaque
+        this.coord = mapJson.coord;
     }
 
     public get size(): Geo.IPoint {
