@@ -62,14 +62,14 @@ export class GameEventHandler {
         newPlayer.id = socket.id;
 
         // Broadcast new player to connected socket clients
-        socket.broadcast.emit('new player', { id: newPlayer.id, x: newPlayer.gridPosition.x, y: newPlayer.gridPosition.y });
+        socket.broadcast.emit('new player', newPlayer.toMessage());
 
         // Send existing players to the new player
         var existingPlayer: Player;
         var players = GameEventHandler.playersHandler.getPlayers();
         for (var i = 0; i < players.length; i++) {
             existingPlayer = players[i];
-            socket.emit('new player', { id: existingPlayer.id, x: existingPlayer.gridPosition.x, y: existingPlayer.gridPosition.y });
+            socket.emit('new player', existingPlayer.toMessage());
         };
 
         // Add new player to the players array
