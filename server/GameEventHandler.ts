@@ -62,15 +62,19 @@ export class GameEventHandler {
         newPlayer.id = socket.id;
 
         // Broadcast new player to connected socket clients
+        //TODO: broadcast to players ON SAME MAP
         socket.broadcast.emit('new player', newPlayer.toMessage());
 
         // Send existing players to the new player
-        var existingPlayer: Player;
+        //TODO: existing players ON SAME MAP
         var players = GameEventHandler.playersHandler.getPlayers();
+        var existingPlayers: any[] = [];
         for (var i = 0; i < players.length; i++) {
-            existingPlayer = players[i];
-            socket.emit('new player', existingPlayer.toMessage());
+            var existingPlayer: any = players[i].toMessage();
+            existingPlayers.push(existingPlayer);
         };
+        var map = GameEventHandler.mapsHandler.getMap({ x: 0, y: 0 });
+        socket.emit('init player', { existingPlayers: existingPlayers, map: map })
 
         // Add new player to the players array
         GameEventHandler.playersHandler.addPlayer(newPlayer);

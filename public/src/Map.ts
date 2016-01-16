@@ -45,7 +45,6 @@ export class Map {
     constructor() {
         this.selectedTileGridCoord = null;
         this.coord = new Phaser.Point(0, 0);
-        this.plateau = GameContext.instance.cache.getJSON('map.' + this.coord.x + '.' + this.coord.y);
 
         // init tileArray
         this.tileArray = [];
@@ -136,6 +135,9 @@ export class Map {
     }
 
     public update() {
+        if (!this.plateau) //TODO: find a better solution
+            return;
+
         // make the water move nicely
         this.water.forEach(function(w) {
             w.isoZ = (-2 * Math.sin((GameContext.instance.time.now + (w.isoX * 7)) * 0.004)) + (-1 * Math.sin((GameContext.instance.time.now + (w.isoY * 8)) * 0.005));
@@ -181,6 +183,9 @@ export class Map {
     }
 
     public initPlateau() {
+        if (!this.plateau) //TODO: find a better solution
+            return;
+
         // remove old tiles
         if (this.plateauTiles)
             this.plateauTiles.forEach(function(tile: Phaser.Plugin.Isometric.IsoSprite) {

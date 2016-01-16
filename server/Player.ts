@@ -86,9 +86,7 @@ export class Player {
             newGridPosition.y = 1;
         }
 
-        if ((this.mapPosition.x != newMapPosition.x || this.mapPosition.y != newMapPosition.y) &&
-            newMapPosition.x >= -1 && newMapPosition.x <= 1 && newMapPosition.y >= -1 && newMapPosition.y <= 1/* TODO: limit maps for the moment*/) {
-
+        if ((this.mapPosition.x != newMapPosition.x || this.mapPosition.y != newMapPosition.y)) {
             var changeMapAction = new Action.ChangeMap(newMapPosition, newGridPosition);
             this.planAction(changeMapAction);
         }

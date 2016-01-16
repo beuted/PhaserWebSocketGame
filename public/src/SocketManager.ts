@@ -13,6 +13,7 @@ export class SocketManager {
         this.socket.on("connect", this.onSocketConnected.bind(this));       // Socket connection successful
         this.socket.on("disconnect", this.onSocketDisconnect.bind(this));   // Socket disconnection
         this.socket.on("new player", this.onNewPlayer.bind(this));          // New player message received
+        this.socket.on("init player", this.onInitPlayer.bind(this));    // Player removed message received
         this.socket.on("move player", this.onMovePlayer.bind(this));        // Player move message received
         this.socket.on("change map player", this.onChangeMapPlayer.bind(this));    // Player removed message received
         this.socket.on("remove player", this.onRemovePlayer.bind(this));    // Player removed message received
@@ -27,7 +28,7 @@ export class SocketManager {
     private onSocketConnected() {
         console.debug("Connected to socket server as " + this.socket.io.engine.id);
 
-        GameContext.player = new Player(1, 1, this.socket.io.engine.id, true);
+        GameContext.player = new Player(8, 8, this.socket.io.engine.id, true);
         GameContext.player = GameContext.player;
 
         // Send local player data to the game server
@@ -45,6 +46,19 @@ export class SocketManager {
 
         // Add new player to the remote players array
         GameContext.remotePlayersManager.addFromJson(data);
+    }
+
+    // Init player
+    private onInitPlayer(data: { existingPlayers: any[], map: any }) {
+        console.debug("Init player: " + JSON.stringify(data));
+
+        // Load current map
+        GameContext.map.changeMap(data.map);
+
+        // Load players on current map
+        _.forEach(data.existingPlayers, (player) => {
+            GameContext.remotePlayersManager.addFromJson(player);
+        });
     }
 
     // Move player
