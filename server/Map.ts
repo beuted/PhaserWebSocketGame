@@ -49,12 +49,6 @@ export class Map {
     }
 
     public toMessage(): any {
-        return {
-            tiles: this.tiles,
-            size: this.size,
-            walkables: this.walkables,
-            opaques: this.opaques,
-            coord: this.coord
-        }
+        return _.pick(this, ["tiles", "size", "walkables", "opaques", "coord"]);
     }
 }
