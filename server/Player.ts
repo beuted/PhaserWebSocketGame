@@ -4,7 +4,7 @@
 // Maybe we could share a common interface between back and front ?
 
 import * as _ from "lodash";
-import * as Geo from "./Geo";
+import * as Geo from "./utils/Geo";
 import * as Action from "./Action";
 import {Map} from "./Map";
 import {GameEventHandler} from "./GameEventHandler";

@@ -1,9 +1,10 @@
 /// <reference path="typings/tsd.d.ts" />
 
 import * as _ from "lodash";
-import * as Geo from "./Geo";
+import * as Geo from "./utils/Geo";
+import {ICoordObject} from "./utils/CoordDic";
 
-export class Map {
+export class Map implements ICoordObject {
     private tiles: number[][];
     private size: Geo.IPoint;
     private walkables: number[];

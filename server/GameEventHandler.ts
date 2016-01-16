@@ -3,7 +3,7 @@
 import * as util from "util";
 import * as _ from "lodash";
 import * as Action from "./Action";
-import * as Geo from "./Geo";
+import * as Geo from "./utils/Geo";
 import {Player} from "./Player";
 import {Map} from "./Map";
 import {MapsHandler} from "./MapsHandler";

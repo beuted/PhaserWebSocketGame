@@ -1,5 +1,5 @@
 import * as _ from "lodash";
-import * as Geo from "./Geo";
+import * as Geo from "./utils/Geo";
 import {GameEventHandler} from "./GameEventHandler";
 import {Player} from "./Player";
 import {Server} from "./Server";

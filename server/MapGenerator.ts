@@ -1,7 +1,8 @@
 /// <reference path="typings/tsd.d.ts" />
 
 import * as _ from "lodash";
-import * as Geo from "./Geo";
+import * as Geo from "./utils/Geo";
+import {CoordDic, ICoordObject} from "./utils/CoordDic";
 import {Map} from "./Map";
 import * as seedrandom from "seedrandom";
 
@@ -12,7 +13,7 @@ interface MapEntries {
     north;
 }
 
-class MapSeed {
+class MapSeed implements ICoordObject {
     private coord: Geo.IPoint;
     public entries: MapEntries;
 
@@ -27,23 +28,9 @@ class MapSeed {
 }
 
 //TODO: extract generic part
-class MapSeedDic {
-    public mapSeedDic: { [key: string]: MapSeed; };
-
+class MapSeedDic extends CoordDic<MapSeed> {
     constructor() {
-        this.mapSeedDic = {};
-    }
-
-    public add(mapSeed: MapSeed) {
-        var coord: Geo.IPoint = mapSeed.getCoord();
-        if (this.mapSeedDic[coord.x + "," + coord.y])
-            throw new Error("This world map has already been inserted"); //TODO: replace ?
-        else
-            this.mapSeedDic[coord.x + "," + coord.y] = mapSeed;
-    }
-
-    public get(key: Geo.IPoint): MapSeed {
-        return this.mapSeedDic[key.x + "," + key.y];
+        super();
     }
 
     public getMapEntriesConstraint(coord: Geo.IPoint): MapEntries {
