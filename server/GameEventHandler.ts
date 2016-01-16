@@ -45,16 +45,20 @@ export class GameEventHandler {
         var socket: SocketIO.Socket = <any>this;
 
         util.log('Player has disconnected: ' + socket.id);
+        var mapCoord: Geo.IPoint = GameEventHandler.playersHandler.getPlayer(socket.id).mapPosition;
 
         // Remove player from playersHandler
         GameEventHandler.playersHandler.removePlayer(socket.id);
 
-        // Broadcast removed player to connected socket clients
-        socket.broadcast.emit('remove player', { id: socket.id });
+        // Broadcast removed player to connected socket clients on the same map
+        var playersOnSameMap = GameEventHandler.playersHandler.getPlayersOnMap(mapCoord);
+        _.forEach(playersOnSameMap, (player: Player) => {
+            Server.io.sockets.connected[player.id].emit('remove player', { id: socket.id });
+        });
     }
 
     // New player has joined
-    private static onNewPlayer(data) {
+    private static onNewPlayer(data: any) {
         var socket: SocketIO.Socket = <any>this;
 
         // Create a new player
@@ -62,19 +66,19 @@ export class GameEventHandler {
         newPlayer.id = socket.id;
 
         // Broadcast new player to connected socket clients
-        //TODO: broadcast to players ON SAME MAP
-        socket.broadcast.emit('new player', newPlayer.toMessage());
+        var playersOnSameMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId({ x: 0, y: 0 }, newPlayer.id);
+        _.forEach(playersOnSameMap, (player: Player) => {
+            Server.io.sockets.connected[player.id].emit('new player', newPlayer.toMessage());
+        });
 
-        // Send existing players to the new player
-        //TODO: existing players ON SAME MAP
-        var players = GameEventHandler.playersHandler.getPlayers();
-        var existingPlayers: any[] = [];
-        for (var i = 0; i < players.length; i++) {
-            var existingPlayer: any = players[i].toMessage();
-            existingPlayers.push(existingPlayer);
-        };
+        // Send existing players & map to the new player
+        var playersOnSameMapJson: any[] = [];
+        _.forEach(playersOnSameMap, (player: Player) => {
+            playersOnSameMapJson.push(player.toMessage());
+        });
+
         var map = GameEventHandler.mapsHandler.getMap({ x: 0, y: 0 });
-        socket.emit('init player', { existingPlayers: existingPlayers, map: map })
+        socket.emit('init player', { existingPlayers: playersOnSameMapJson, map: map })
 
         // Add new player to the players array
         GameEventHandler.playersHandler.addPlayer(newPlayer);
