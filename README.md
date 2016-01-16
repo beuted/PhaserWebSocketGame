@@ -5,9 +5,9 @@
 This Project aim to be bootstrap Phaser project for turn based isometric games where the player in moving on a grid.
 
 ## Features
-* Grid Map saved as Json files rendered with _isometric tiles_
-* _Multiplayer_ enabled using socket.io (the players can see eachothers moving on the map)
-* Movement enabled by clicking using an _A\* pathfinding **client side**_
+* _Randomly generated maps_ based on a seed ([Seedrandom](https://github.com/davidbau/seedrandom/blob/released/seedrandom.js)) rendered with _[isometric tiles](http://www.rotates.org/phaser/iso/)_
+* _Multiplayer_ enabled using [Socket.io](http://socket.io/) (the players can see eachothers moving on the different maps)
+* Movement enabled by clicking using an _[A\* pathfinding client side](http://www.easystarjs.com/)_
 * Feild of view of the player computed with a _recursive shadowcasting_
 
 ## Setup project
@@ -34,6 +34,7 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 **In Server**
 * [Nodejs v4.2.2](https://nodejs.org)
 * [Express](http://expressjs.com/)
+* [Seedrandom](https://github.com/davidbau/seedrandom/blob/released/seedrandom.js)
 
 ## Development grunt commands
 * `grunt ts:public`: Compile the typescript client files
