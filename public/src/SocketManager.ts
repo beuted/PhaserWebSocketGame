@@ -60,7 +60,7 @@ export class SocketManager {
     // Player changed map
     private onChangeMapPlayer(data: { id: string, gridPosition: { x: number, y: number }, mapPosition: { x: number, y: number }, players: any[], map: any[][] }) {
         if (GameContext.player.id === data.id) {
-            console.debug('Player changed map, id: ' + data.id + ', mapPosition: ' + JSON.stringify(data.mapPosition) + ', gridPosition: ' + JSON.stringify(data.gridPosition));
+            console.debug('Player changed map: ' + JSON.stringify(data));
             GameContext.map.changeMap(data.map);
             GameContext.player.moveInstant(new Phaser.Point(data.gridPosition.x, data.gridPosition.y));
             GameContext.remotePlayersManager.removeAll();

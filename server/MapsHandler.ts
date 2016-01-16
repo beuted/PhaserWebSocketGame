@@ -3,6 +3,7 @@
 import * as _ from "lodash";
 import * as Geo from "./Geo";
 import {Map} from "./Map";
+import {MapGenerator} from "./MapGenerator";
 
 class MapDic {
     public mapDic: { [key: string] : Map; };
@@ -11,11 +12,12 @@ class MapDic {
         this.mapDic = {};
     }
 
-    public add(key: Geo.IPoint, map: Map) {
-        if (this.mapDic[key.x + "," + key.y])
+    public add(map: Map) {
+        var coord: Geo.IPoint = map.getCoord();
+        if (this.mapDic[coord.x + "," + coord.y])
             throw new Error("This map has already been inserted"); //TODO: replace ?
         else
-            this.mapDic[key.x + "," + key.y] = map;
+            this.mapDic[coord.x + "," + coord.y] = map;
     }
 
     public get(key: Geo.IPoint): Map {
@@ -25,12 +27,14 @@ class MapDic {
 
 export class MapsHandler {
     private maps: MapDic;
+    private mapGenerator: MapGenerator;
 
     constructor() {
         this.maps = new MapDic();
+        this.mapGenerator = new MapGenerator(42);
 
-        var map: Map = new Map('../public/maps/map.0.0');
-        this.maps.add({ x: 0, y: 0 }, map)
+        var map: Map = this.mapGenerator.generate({ x: 0, y: 0 });
+        this.maps.add(map)
     }
 
     // Get the map at @coord, if not found, load it
@@ -42,8 +46,8 @@ export class MapsHandler {
     }
 
     private loadMap(coord: Geo.IPoint): Map {
-        var map: Map = new Map('../public/maps/map.' + coord.x + "." + coord.y);
-        this.maps.add(coord, map);
+        var map: Map = this.mapGenerator.generate(coord);
+        this.maps.add(map);
         return map;
     }
 

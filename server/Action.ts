@@ -48,7 +48,7 @@ export class ChangeMap implements IAction {
 
         // Send the change map message to the player changing map
         var playersOnDestMapMessage = _.map(playersOnDestMap, player => player.toMessage());
-        var newMap = GameEventHandler.mapsHandler.getMap(this.destMap);
+        var newMap = GameEventHandler.mapsHandler.getMap(this.destMap).toMessage();
 
         Server.io.sockets.connected[player.id].emit('change map player', {
             id: player.id,

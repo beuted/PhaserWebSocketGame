@@ -22,10 +22,9 @@ export enum TileType {
 interface Plateau {
     tiles: number[][];
     coord: { x: number, y: number };
-    sizeX: number;
-    sizeY: number;
+    size: { x: number, y: number };
     walkables: number[];
-    opaque: number[];
+    opaques: number[];
 }
 
 export class Map {
@@ -76,7 +75,7 @@ export class Map {
         this.initPlateau();
     }
 
-    public get plateauSize() { return new Phaser.Point(this.plateau.sizeX, this.plateau.sizeY) }
+    public get plateauSize() { return new Phaser.Point(this.plateau.size.x, this.plateau.size.y) }
 
     public getPlateau(point: Phaser.Point): number {
         var line = this.plateau.tiles[point.y];
@@ -95,7 +94,7 @@ export class Map {
         }
 
         // don't go out of the map TODO REFACTO
-        if (point.x < 0 || point.x > this.plateau.sizeX - 1 || point.y < 0 || point.y > this.plateau.sizeY - 1)
+        if (point.x < 0 || point.x > this.plateau.size.x - 1 || point.y < 0 || point.y > this.plateau.size.y - 1)
             return false;
 
         return true;
@@ -125,12 +124,12 @@ export class Map {
     public isCaseOpaque(point: Phaser.Point) {
         // collision handling
         var destTile: TileType = this.getPlateau(point);
-        if (_.includes(this.plateau.opaque, destTile)) {
+        if (_.includes(this.plateau.opaques, destTile)) {
             return true;
         }
 
         // don't go out of the map TODO REFACTO
-        if (point.x < 0 || point.x > this.plateau.sizeX - 1 || point.y < 0 || point.y > this.plateau.sizeY - 1)
+        if (point.x < 0 || point.x > this.plateau.size.x - 1 || point.y < 0 || point.y > this.plateau.size.y - 1)
             return true;
 
         return false;
@@ -163,7 +162,7 @@ export class Map {
                 selectedTile = tile;
                 tile.tint = 0x86bfda;
 
-                this.selectedTileGridCoord = new Phaser.Point(i % this.plateau.sizeX, Math.floor(i / this.plateau.sizeX));
+                this.selectedTileGridCoord = new Phaser.Point(i % this.plateau.size.x, Math.floor(i / this.plateau.size.x));
             }
         }, this);
 
@@ -178,7 +177,7 @@ export class Map {
     }
 
     public getPlateauTile(point: Phaser.Point) {
-        return this.plateauTiles[point.x + point.y * this.plateau.sizeX];
+        return this.plateauTiles[point.x + point.y * this.plateau.size.x];
     }
 
     public initPlateau() {
@@ -198,8 +197,8 @@ export class Map {
 
         var tile;
         var point: Phaser.Point = new Phaser.Point(0, 0);
-        for (point.y = 0; point.y < this.plateau.sizeY; point.y++) {
-            for (point.x = 0; point.x < this.plateau.sizeX; point.x++) {
+        for (point.y = 0; point.y < this.plateau.size.y; point.y++) {
+            for (point.x = 0; point.x < this.plateau.size.x; point.x++) {
                 // this bit would've been so much cleaner if I'd ordered the tileArray better, but I can't be bothered fixing it :P
                 tile = GameContext.instance.add.isoSprite(point.x * Map.tileSize, point.y * Map.tileSize, 0, 'tileset', this.tileArray[this.getPlateau(point)], Map.isoGroup);
                 tile.anchor.set(0.5, 1);

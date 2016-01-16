@@ -63,7 +63,7 @@ export class Player {
 
     public update() {
         // Change player map if player as reach map borders in it's last action
-        var mapSize: Geo.IPoint = this.map.size;
+        var mapSize: Geo.IPoint = this.map.getSize();
         var newMapPosition: Geo.IPoint = { x: this.mapPosition.x, y: this.mapPosition.y }
         var newGridPosition: Geo.IPoint = { x: this.gridPosition.x, y: this.gridPosition.y }
 

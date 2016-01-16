@@ -5,32 +5,33 @@ import * as Geo from "./Geo";
 
 export class Map {
     private tiles: number[][];
-    private sizeX: number;
-    private sizeY: number;
+    private size: Geo.IPoint;
     private walkables: number[];
-    private opaque: number[];
+    private opaques: number[];
     private coord: Geo.IPoint;
 
-    constructor(file: string) {
-        var mapJson: any = require(file);
-        this.tiles = mapJson.tiles;
-        this.sizeX = mapJson.sizeX
-        this.sizeY = mapJson.sizeY
-        this.walkables = mapJson.walkables
-        this.opaque = mapJson.opaque
-        this.coord = mapJson.coord;
-    }
-
-    public get size(): Geo.IPoint {
-        return { x: this.sizeX, y: this.sizeY }
+    constructor(tiles: number[][], size: Geo.IPoint, walkables: number[], opaques: number[], coord: Geo.IPoint) {
+        this.tiles = tiles;
+        this.size = size;
+        this.walkables = walkables
+        this.opaques = opaques
+        this.coord = coord;
     }
 
     public isCaseWalkable(point: Geo.IPoint): boolean {
         return _.includes(this.walkables, this.getCase({ x: point.x, y: point.y }));
     }
 
+    public getSize(): Geo.IPoint {
+        return this.size;
+    }
+
     public getCase(point: Geo.IPoint): any {
         return this.tiles[point.y][point.x]
+    }
+
+    public getCoord(): Geo.IPoint {
+        return this.coord;
     }
 
     public isPathWalkable(path: Geo.IPoint[]) {
@@ -45,5 +46,15 @@ export class Map {
             prevPoint = path[i];
         }
         return true;
+    }
+
+    public toMessage(): any {
+        return {
+            tiles: this.tiles,
+            size: this.size,
+            walkables: this.walkables,
+            opaques: this.opaques,
+            coord: this.coord
+        }
     }
 }
