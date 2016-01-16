@@ -31,7 +31,7 @@ export class MapsHandler {
 
     constructor() {
         this.maps = new MapDic();
-        this.mapGenerator = new MapGenerator(42);
+        this.mapGenerator = new MapGenerator("this is a random seed");
 
         var map: Map = this.mapGenerator.generate({ x: 0, y: 0 });
         this.maps.add(map)
