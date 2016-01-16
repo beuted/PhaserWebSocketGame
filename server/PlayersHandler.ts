@@ -38,9 +38,8 @@ export class PlayersHandler {
     }
 
     public getPlayersOnMapWithoutId(coord: Geo.IPoint, id: string) {
-        var playersOnMap: Player[] = this.getPlayersOnMap(coord);
-        return _.filter(playersOnMap, function(player) {
-            return player.id !== id;
+        return _.filter(this.players, function(player) {
+            return player.mapPosition.x == coord.x && player.mapPosition.y == coord.y && player.id !== id;
         });
     }
 
