@@ -68,7 +68,7 @@ export class MapGenerator {
         this.rng = seedrandom(seed);
         this.seed = seed;
         this.walkables = [1, 2, 3, 4, 5, 6, 7];
-        this.opaques = [8, 9, 10, 11];
+        this.opaques = [8, 9, 10, 11, 13];
         this.size = { x: 16, y: 16 };
 
         this.initSampleMaps();

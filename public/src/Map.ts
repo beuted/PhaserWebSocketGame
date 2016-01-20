@@ -5,18 +5,19 @@ import {LightSource} from "./ShadowCasting";
 
 export enum TileType {
     Water = 0,
-    Sand,
-    Grass,
-    Stone,
-    Wood,
-    Watersand,
-    Grasssand,
-    Sandstone,
-    Bush1,
-    Bush2,
-    Mushroom,
-    Wall,
-    Window,
+    Sand = 1,
+    Grass = 2,
+    Stone = 3,
+    Wood = 4,
+    Watersand = 5,
+    Grasssand = 6,
+    Sandstone = 7,
+    Bush1 = 8,
+    Bush2 = 9,
+    Mushroom = 10,
+    Wall = 11,
+    Window = 12,
+    Wallangle = 13
 }
 
 interface Plateau {
@@ -61,6 +62,7 @@ export class Map {
         this.tileArray[TileType.Mushroom] = 'mushroom';
         this.tileArray[TileType.Wall] = 'wall';
         this.tileArray[TileType.Window] = 'window';
+        this.tileArray[TileType.Wallangle] = 'wallangle';
 
         // init isoGroup
         Map.isoGroup = GameContext.instance.add.group();
