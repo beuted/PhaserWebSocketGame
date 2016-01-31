@@ -5,6 +5,7 @@ import * as Geo from "./utils/Geo";
 import {CoordDic, ICoordObject} from "./utils/CoordDic";
 import {Map} from "./Map";
 import * as seedrandom from "seedrandom";
+import * as Voronoi from "voronoi";
 
 interface MapEntries {
     south;
@@ -72,6 +73,22 @@ export class MapGenerator {
         this.size = { x: 16, y: 16 };
 
         this.initSampleMaps();
+
+        var voronoi = new Voronoi();
+        var bbox = { xl: 0, xr: 100, yt: 0, yb: 100 }; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+        var sites = [{ x: 23, y: 20 }, { x: 22, y: 43 }, { x: 21, y: 77 }, { x: 52, y: 27 }, { x: 51, y: 53 }, { x: 54, y: 70 }, { x: 71, y: 24 }, { x: 73, y: 51 }, { x: 71, y: 73 }];
+
+        var diagram = voronoi.compute(sites, bbox);
+
+        var polygone = Geo.Tools.getCasesInPolygone(diagram.cells[5].halfedges);
+
+        var polygones = [];
+        for (var i = 0; i < diagram.cells.length; i++) {
+            var polygone = Geo.Tools.getCasesInPolygone(diagram.cells[i].halfedges);
+            polygones.push(polygone);
+        }
+
+        console.log(JSON.stringify(polygones));
     }
 
     public generate(coord: Geo.IPoint): Map {
