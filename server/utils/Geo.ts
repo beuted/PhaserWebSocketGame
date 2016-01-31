@@ -98,4 +98,16 @@ export class Tools {
 
         return polygone;
     }
+
+    static getCasesInPolygoneEdges(halfedges: { edge: { vb: IPoint, va: IPoint } }[]) {
+        var polygoneEdges = [];
+
+        _.each(halfedges, (halfedge: { edge: { vb: IPoint, va: IPoint } }) => {
+            var a = { x: Math.floor(halfedge.edge.va.x), y: Math.floor(halfedge.edge.va.y) };
+            var b = { x: Math.floor(halfedge.edge.vb.x), y: Math.floor(halfedge.edge.vb.y) };
+            polygoneEdges = polygoneEdges.concat(Tools.getLine(a, b));
+        });
+
+        return polygoneEdges;
+    }
 }

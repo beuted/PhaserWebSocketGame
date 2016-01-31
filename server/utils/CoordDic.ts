@@ -15,10 +15,7 @@ export class CoordDic<T extends ICoordObject> {
 
     public add(entry: T) {
         var coord: Geo.IPoint = entry.getCoord();
-        if (this.dictionnary[coord.x + "," + coord.y])
-            throw new Error("This entry has already been inserted");
-        else
-            this.dictionnary[coord.x + "," + coord.y] = entry;
+        this.dictionnary[coord.x + "," + coord.y] = entry;
     }
 
     public get(key: Geo.IPoint): T {
