@@ -20,7 +20,8 @@
     "grunt-tsd": "^0.1.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt ts:server && jasmine-node server",
+    "play": "grunt ts:server ts:public && node app.js"
   },
   "repository": {
     "type": "git",
