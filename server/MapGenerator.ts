@@ -77,8 +77,8 @@ export class MapGenerator {
 
     private buildMapSeeds() {
         var voronoi = new Voronoi();
-        var bbox = { xl: 0, xr: 100, yt: 0, yb: 100 }; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
-        var sites = [{ x: 23, y: 20 }, { x: 22, y: 43 }, { x: 21, y: 77 }, { x: 52, y: 27 }, { x: 51, y: 53 }, { x: 54, y: 70 }, { x: 71, y: 24 }, { x: 73, y: 51 }, { x: 71, y: 73 }];
+        var bbox = { xl: 0, xr: 50, yt: 0, yb: 50 }; // xl is x-left, xr is x-right, yt is y-top, and yb is y-bottom
+        var sites = [{ x: 11, y: 10 }, { x: 11, y: 21 }, { x: 10, y: 46 }, { x: 25, y: 24 }, { x: 25, y: 27 }, { x: 24, y: 35 }, { x: 30, y: 12 }, { x: 35, y: 25 }, { x: 36, y: 30 }];
 
         var diagram = voronoi.compute(sites, bbox);
 
