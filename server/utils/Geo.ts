@@ -16,7 +16,7 @@ export class Tools {
 	}
 
     // simple Bresenham implementation
-    static getLine(A: IPoint, B: IPoint) {
+    static getLine(A: IPoint, B: IPoint): IPoint[] {
         var linePoints: IPoint[] = [];
         // Translate coordinates
         var x1 = A.x;
@@ -50,7 +50,7 @@ export class Tools {
     }
 
     // This function might return duplicates values
-    static getCasesInPolygone(halfedges: { edge: { vb: IPoint, va: IPoint } }[]) {
+    static getCasesInPolygone(halfedges: { edge: { vb: IPoint, va: IPoint } }[]): IPoint[] {
         var polygoneEdges = [];
         var minX: number = Number.MAX_VALUE;
         var maxX: number = Number.MIN_VALUE;
@@ -99,7 +99,7 @@ export class Tools {
         return polygone;
     }
 
-    static getCasesInPolygoneEdges(halfedges: { edge: { vb: IPoint, va: IPoint } }[]) {
+    static getCasesInPolygoneEdges(halfedges: { edge: { vb: IPoint, va: IPoint } }[]): IPoint[] {
         var polygoneEdges = [];
 
         _.each(halfedges, (halfedge: { edge: { vb: IPoint, va: IPoint } }) => {
