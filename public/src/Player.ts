@@ -38,7 +38,8 @@ export class Player {
         this.gridPosition = destPoint;
         this.sprite.x = destPoint.x * 32;
         this.sprite.y = destPoint.y * 32;
-        //GameContext.instance.add.tween(this.sprite.body).to({ x: destPoint.x * 32, y: destPoint.y * 32 }, 250, Phaser.Easing.Linear.None, true)
+        // TODO: b.jehanno (hack to move instant because I can't make it work without this T_T )
+        GameContext.instance.add.tween(this.sprite.body).to({ x: destPoint.x * 32, y: destPoint.y * 32 }, 1, Phaser.Easing.Linear.None, true)
     }
 
     public destroy() {
