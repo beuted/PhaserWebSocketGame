@@ -30,4 +30,4 @@ export class LoadState
         GameContext.instance.load.spritesheet('fairy_anim', 'assets/fairy.png', 96, 96, 16);
         //GameContext.instance.load.atlasJSONHash('tileset', 'assets/tileset-mod.png', 'assets/tileset-mod.json'); // Attempt to do better
     }
-};
+}

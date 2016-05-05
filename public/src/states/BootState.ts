@@ -17,4 +17,4 @@ export class BootState
     public update() {}
 
     public render() {}
-};
+}

@@ -1,60 +1,20 @@
 /// <reference path="typings/tsd.d.ts" />
 
-import {Player} from "./src/Player";
 import {GameContext} from "./src/GameContext";
-import {Map} from "./src/Map";
-import {TileType} from "./src/Map"
-import {LoadState} from "./src/states/LoadState";
 import {BootState} from "./src/states/BootState";
+import {LoadState} from "./src/states/LoadState";
+import {MainState} from "./src/states/MainState";
 
 export class Game {
     constructor() {
-        GameContext.init();
-
-        var BasicGame: any = function (game) { };
-        BasicGame.Boot = function(game) { };
-
-        BasicGame.Boot.prototype =
-        {
-            preload: function () {},
-            create: function() {
-
-                // init GameContext (map, keyboard controls, socketManager, remote players, ...TODO)
-                GameContext.create();
-
-                // Capture click
-                GameContext.instance.input.onUp.add(() => movePlayer(GameContext.map.selectedTileGridCoord), this);
-            },
-            update: function () {
-                GameContext.update();
-            },
-            render: function() {
-                if (GameContext.debugActivated) {
-                    Map.isoGroup.forEach(function(tile) {
-                        GameContext.instance.debug.body(tile, 'rgba(189, 221, 235, 0.6)', false);
-                    }, this);
-                    GameContext.instance.debug.text(!!GameContext.instance.time.fps ? GameContext.instance.time.fps + ' fps' : '--', 2, 14, "#a7aebe");
-                }
-            }
-        };
+        // using canvas here just because it runs faster for the body debug stuff
+        GameContext.instance = <Phaser.Plugin.Isometric.Game>new Phaser.Game(1000, 800, Phaser.CANVAS, 'gameCanvas', null, true, false);
+        GameContext.debugActivated = false;
 
         GameContext.instance.state.add('Boot', new BootState());
         GameContext.instance.state.add('Load', new LoadState());
-        GameContext.instance.state.add('Game', BasicGame.Boot);
+        GameContext.instance.state.add('Game', new MainState());
+
         GameContext.instance.state.start('Boot');
-
-        //TODO: this should be in a class handling current player actions
-        function movePlayer(toPoint: Phaser.Point) {
-            if (!toPoint || GameContext.remotePlayersManager.arePresentAt(toPoint))
-                return;
-
-            GameContext.map.findPath(GameContext.player.gridPosition, toPoint)
-            .then((path: any[]) => {
-                GameContext.socketManager.requestPlayerMove(path);
-            })
-            .catch((error: string) => {
-                console.debug("[movePlayer] Could not find path to point: (" + toPoint.x + ", " + toPoint.y + ") : " + error);
-            })
-        }
     }
 }

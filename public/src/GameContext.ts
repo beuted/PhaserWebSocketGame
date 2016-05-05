@@ -13,12 +13,6 @@ export class GameContext {
 
     static debugActivated: boolean;
 
-    static init() {
-        // using canvas here just because it runs faster for the body debug stuff
-        GameContext.instance = <Phaser.Plugin.Isometric.Game> new Phaser.Game(1000, 800, Phaser.CANVAS, 'gameCanvas', null, true, false);
-        this.debugActivated = false;
-    }
-
     static create() {
         this.socketManager = new SocketManager();
         this.map = new Map();
