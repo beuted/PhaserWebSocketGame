@@ -55,8 +55,13 @@ export class MapGenerator {
         this.buildMapSeeds();
     }
 
+    /**
+     * Generate a Map depending on the positon, return null if map out of boundaries.
+     */
     public generate(coord: Geo.IPoint): Map {
         var mapSeed = this.mapSeeds.get(coord);
+        if (!mapSeed)
+            return null;
 
         var mapJson;
         if (mapSeed.isBorder)

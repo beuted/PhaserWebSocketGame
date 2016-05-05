@@ -38,24 +38,24 @@ export class ChangeMap implements IAction {
     }
 
     public execute(player: Player) {
-        player.gridPosition = this.destCase;
+        var newMap = GameEventHandler.mapsHandler.getMap(this.destMap);
 
         var playersOnPrevMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(player.mapPosition, player.id);
         var playersOnDestMap = GameEventHandler.playersHandler.getPlayersOnMapWithoutId(this.destMap, player.id);
 
+        player.gridPosition = this.destCase;
         player.mapPosition = this.destMap;
         player.gridPosition = this.destCase;
 
         // Send the change map message to the player changing map
         var playersOnDestMapMessage = _.map(playersOnDestMap, player => player.toMessage());
-        var newMap = GameEventHandler.mapsHandler.getMap(this.destMap).toMessage();
 
         Server.io.sockets.connected[player.id].emit('change map player', {
             id: player.id,
             gridPosition: { x: player.gridPosition.x, y: player.gridPosition.y },
             mapPosition: { x: player.mapPosition.x, y: player.mapPosition.y },
             players: playersOnDestMapMessage,
-            map: newMap
+            map: newMap.toMessage()
         });
 
         // Notify players from previous map

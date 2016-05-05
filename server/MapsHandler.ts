@@ -28,6 +28,9 @@ export class MapsHandler {
 
     private loadMap(coord: Geo.IPoint): Map {
         var map: Map = this.mapGenerator.generate(coord);
+        if (!map)
+            return null;
+
         this.maps.add(map);
         return map;
     }
