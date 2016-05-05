@@ -54,10 +54,10 @@ export class GameContext {
         this.map.update();
     }
 
-    static boot(boot: any) {
-        GameContext.instance.state.add('Boot', boot);
+/*    static boot(bootState: any) {
+        GameContext.instance.state.add('Boot', bootState);
         GameContext.instance.state.start('Boot');
-    }
+    }*/
 
     private static preloadAssets() {
         GameContext.instance.load.json('map.0.0', 'maps/map.0.0.json');

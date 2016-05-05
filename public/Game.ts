@@ -4,6 +4,7 @@ import {Player} from "./src/Player";
 import {GameContext} from "./src/GameContext";
 import {Map} from "./src/Map";
 import {TileType} from "./src/Map"
+import {LoadState} from "./src/states/LoadState";
 
 export class Game {
     constructor() {
@@ -38,7 +39,9 @@ export class Game {
             }
         };
 
-        GameContext.boot(BasicGame.Boot);
+        GameContext.instance.state.add('Game', BasicGame.Boot);
+        GameContext.instance.state.add('Load', LoadState);
+        GameContext.instance.state.start('Load');
 
         //TODO: this should be in a class handling current player actions
         function movePlayer(toPoint: Phaser.Point) {
