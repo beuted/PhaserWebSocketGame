@@ -47,5 +47,7 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 * `npm run test`: Run unit tests (note: needs jasmine node installed `npm install jasmine-node -g`)
 * `npm run play`: Alias for `grunt ts:server ts:public && node app.js`
 
+Note: I've added the node package _devloop_ just install it and run `loop` to dev with it.
+
 ## Licence
 **MIT**
