@@ -5,6 +5,7 @@ import {GameContext} from "./src/GameContext";
 import {Map} from "./src/Map";
 import {TileType} from "./src/Map"
 import {LoadState} from "./src/states/LoadState";
+import {BootState} from "./src/states/BootState";
 
 export class Game {
     constructor() {
@@ -15,9 +16,7 @@ export class Game {
 
         BasicGame.Boot.prototype =
         {
-            preload: function () {
-                GameContext.preload();
-            },
+            preload: function () {},
             create: function() {
 
                 // init GameContext (map, keyboard controls, socketManager, remote players, ...TODO)
@@ -39,9 +38,10 @@ export class Game {
             }
         };
 
+        GameContext.instance.state.add('Boot', new BootState());
+        GameContext.instance.state.add('Load', new LoadState());
         GameContext.instance.state.add('Game', BasicGame.Boot);
-        GameContext.instance.state.add('Load', LoadState);
-        GameContext.instance.state.start('Load');
+        GameContext.instance.state.start('Boot');
 
         //TODO: this should be in a class handling current player actions
         function movePlayer(toPoint: Phaser.Point) {
