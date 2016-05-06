@@ -4,7 +4,9 @@ import {GameContext} from "../GameContext";
 
 export class BootState
 {
-    public preload() {}
+    public preload() {
+        console.debug('Entering BootState');
+    }
 
     public create() {
         GameContext.instance.plugins.add(Phaser.Plugin.Isometric, GameContext.instance);

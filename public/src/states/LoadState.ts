@@ -5,6 +5,8 @@ import {GameContext} from "../GameContext";
 export class LoadState
 {
     public preload() {
+        console.debug('Entering LoadState');
+
         //Display Loading screen
         GameContext.instance.add.text(80, 150, 'loading...', { font: '30px Courier', fill: '#ffffff' });
 
@@ -16,7 +18,7 @@ export class LoadState
     }
 
     public create() {
-        GameContext.instance.state.start('Game');
+        GameContext.instance.state.start('Main');
     }
 
     public update() {}

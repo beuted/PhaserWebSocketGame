@@ -14,24 +14,14 @@ export class GameContext {
     static debugActivated: boolean;
 
     static create() {
-        this.socketManager = new SocketManager();
-        this.map = new Map();
-        this.remotePlayersManager = new RemotePlayersManager();
-
-        GameContext.instance.input.keyboard.addKeyCapture([
-            Phaser.Keyboard.SPACEBAR
-        ]);
+        if(!this.socketManager) this.socketManager = new SocketManager();
+        if(!this.map)  this.map = new Map();
+        if(!this.remotePlayersManager) this.remotePlayersManager = new RemotePlayersManager();
 
         // TODO: (wip) Add loader callbacks
-        GameContext.instance.load.onLoadComplete.add(() => {
+/*        GameContext.instance.load.onLoadComplete.add(() => {
             console.debug("[Loader] Load complete");
-        }, this);
-
-        // press space to enter debugmode
-        var space = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-        space.onDown.add(function() {
-            this.debugActivated = !this.debugActivated;
-        }, this);
+        }, this);*/
     }
 
     static update() {

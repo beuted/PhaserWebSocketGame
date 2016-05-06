@@ -5,14 +5,16 @@ import {Map} from "../Map";
 import {Player} from "../Player";
 
 export class MainState {
-    public preload() {}
+    public preload() {
+        console.debug('Entering MainState');
+    }
 
     public create() {
         // init GameContext (map, keyboard controls, socketManager, remote players, ...TODO)
         GameContext.create();
 
-        // Capture click
-        GameContext.instance.input.onUp.add(() => this.movePlayer(GameContext.map.selectedTileGridCoord), this);
+        this.initKeyboardInteraction();
+        this.initMouseInteraction();
     }
 
     public update() {
@@ -40,5 +42,30 @@ export class MainState {
             .catch((error: string) => {
                 console.debug("[movePlayer] Could not find path to point: (" + toPoint.x + ", " + toPoint.y + ") : " + error);
             })
+    }
+
+    private initKeyboardInteraction() {
+        GameContext.instance.input.keyboard.addKeyCapture([
+            Phaser.Keyboard.D,
+            Phaser.Keyboard.SPACEBAR
+        ]);
+
+        // press D to enter debugmode
+        var dKey = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.D);
+        dKey.onDown.add(function() {
+            GameContext.debugActivated = !GameContext.debugActivated;
+        }, this);
+
+        // press space to enter fight state
+        var space = GameContext.instance.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+        space.onDown.add(function() {
+            //don't clear the game world but cache
+            GameContext.instance.state.start('Fight', false, true);
+        }, this);
+    }
+
+    private initMouseInteraction() {
+        // Capture click
+        GameContext.instance.input.onUp.add(() => this.movePlayer(GameContext.map.selectedTileGridCoord), this);
     }
 }
