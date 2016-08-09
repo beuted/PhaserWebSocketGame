@@ -9,7 +9,7 @@ export class SocketManager {
     private socket: SocketIOClient.Socket;
 
     constructor() {
-        this.socket = io('http://' + window.location.hostname + ':8000');
+        this.socket = io();
         this.socket.on("connect", this.onSocketConnected.bind(this));       // Socket connection successful
         this.socket.on("disconnect", this.onSocketDisconnect.bind(this));   // Socket disconnection
         this.socket.on("new player", this.onNewPlayer.bind(this));          // New player message received

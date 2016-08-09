@@ -13,11 +13,15 @@ export class Server {
         Server.instance = require('http').createServer(Server.app);
         Server.io = require('socket.io')(Server.instance);
 
+        var port = process.env.PORT || 3000;
+
         // Serve client files
         Server.app.use(express.static('public'));
-        Server.app.listen(3000);
+        var server = Server.app.listen(port, () => {
+            console.log('PhaserWebSocketGame is running at localhost:' + port);
+        });
 
         // Set up Socket.IO to listen on port 8000
-        Server.io.listen(8000);
+        Server.io.listen(server);
     }
 }
