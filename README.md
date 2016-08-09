@@ -46,8 +46,6 @@ This Project aim to be bootstrap Phaser project for turn based isometric games w
 * `grunt dev-server`: Run a watch on the server files, compiling the typescript files and restarting the node server
 * `grunt dev-public`: Run a watch on the client files, compiling the typescript files
 * `grunt dev`: Run both watches
-
-
 * `npm run test`: Run unit tests (note: needs jasmine node installed `npm install jasmine-node -g`)
 * `npm run play`: Alias for `grunt ts:server ts:public && node app.js`
 
